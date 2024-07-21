@@ -1,0 +1,14 @@
+﻿  blending.cpp
+  main.cpp
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\blending.cpp(77,72): warning C4100: 'out_texture': unreferenced formal parameter
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\blending.cpp(77,50): warning C4100: 'in_texture_2': unreferenced formal parameter
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\blending.cpp(77,28): warning C4100: 'in_texture_1': unreferenced formal parameter
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\blending.cpp(100,38): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\blending.cpp(101,38): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\blending.cpp(114,32): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\stb_image_write.h(776,13): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\main.cpp(222,101): warning C4244: 'argument': conversion from 'uint32_t' to 'float', possible loss of data
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\main.cpp(222,80): warning C4244: 'argument': conversion from 'uint32_t' to 'float', possible loss of data
+C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\main.cpp(94,12): warning C4189: 'bg_img_texture': local variable is initialized but not referenced
+  Generating Code...
+  example_glfw_opengl3.vcxproj -> C:\Projects\GP-Exercises\GP-ex0\examples\example_glfw_opengl3\Debug\example_glfw_opengl3.exe
