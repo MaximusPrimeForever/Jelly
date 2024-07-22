@@ -163,10 +163,14 @@ int main(int, char**)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, blended_image.width, blended_image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, blended_image.image_data);
 
     ImGui::FileBrowser fileDialog;
+    bool has_ui_values_changed = false;
+    BlendRawImages(&bg_image, &fg_image, fg_image_pos_x, fg_image_pos_y, blending_modes_enum[current_mode], &blended_image);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
+        has_ui_values_changed = false;
+
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
@@ -215,19 +219,22 @@ int main(int, char**)
                 }
 
                 fileDialog.ClearSelected();
+                has_ui_values_changed |= true;
             }
 
             ImGui::Text("pointer = %x", blended_texture);
             ImGui::Text("size = %d x %d", blended_image.width, blended_image.height);
 
-            ImGui::SliderFloat("FG image opacity", &fg_image.opacity, 0.0f, 1.0f);
-            ImGui::SliderInt("FG image x", &fg_image_pos_x, -1 * bg_image.width, bg_image.width);
-            ImGui::SliderInt("FG image y", &fg_image_pos_y, -1 * bg_image.height, bg_image.width);
+            has_ui_values_changed |= ImGui::SliderFloat("FG image opacity", &fg_image.opacity, 0.0f, 1.0f);
+            has_ui_values_changed |= ImGui::SliderInt("FG image x", &fg_image_pos_x, -1 * bg_image.width, bg_image.width);
+            has_ui_values_changed |= ImGui::SliderInt("FG image y", &fg_image_pos_y, -1 * bg_image.height, bg_image.width);
 
-            ImGui::ListBox("listbox", &current_mode, blending_modes_strings, IM_ARRAYSIZE(blending_modes_strings));
+            has_ui_values_changed |= ImGui::ListBox("listbox", &current_mode, blending_modes_strings, IM_ARRAYSIZE(blending_modes_strings));
 
             // Update texture to new blended image
-            BlendRawImages(&bg_image, &fg_image, fg_image_pos_x, fg_image_pos_y, blending_modes_enum[current_mode], &blended_image);
+            if (has_ui_values_changed) {
+                BlendRawImages(&bg_image, &fg_image, fg_image_pos_x, fg_image_pos_y, blending_modes_enum[current_mode], &blended_image);
+            }
             glBindTexture(GL_TEXTURE_2D, blended_texture);
             glTexSubImage2D(
                 GL_TEXTURE_2D, 0, 0, 0, 
