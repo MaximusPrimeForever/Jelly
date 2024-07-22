@@ -34,3 +34,4 @@
 .vs/
 .Debug/
 .Release/
+./examples/example_glfw_opengl3/Debug/

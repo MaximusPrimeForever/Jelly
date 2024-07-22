@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <iostream>
 
 // IMGUI
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+
+#include "imfilebrowser.h"
 
 // OpenGL/GLFW
 #define GL_SILENCE_DEPRECATION
@@ -18,6 +21,11 @@
 #include "stb_image_write.h"
 
 #include "blending.h"
+#include "settings.h"
+#include "window_init.h"
+
+#define BG_IMG_ID (1)
+#define FG_IMG_ID (2)
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -63,9 +71,25 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(2160, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
-    if (window == nullptr)
+    int monitor_width, monitor_height;
+    float monitor_width_dpi_scale, monitor_height_dpi_scale;
+    GetMonitorDimensions(&monitor_width , &monitor_height, &monitor_width_dpi_scale, &monitor_height_dpi_scale);
+    if (monitor_width_dpi_scale != monitor_height_dpi_scale) {
+        std::cout << "Width and height DPI scales are different. ";
+        std::cout << "No idea how to handle that. fuck you";
         return 1;
+    }
+
+    GLFWwindow* window = glfwCreateWindow(
+        monitor_width * WINDOW_WIDTH_REL_SCALE,
+        monitor_height * WINDOW_HEIGHT_REL_SCALE,
+        "Dear ImGui GLFW+OpenGL3 example", 
+        nullptr,
+        nullptr
+    );
+    if (window == nullptr) return 1;
+
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -73,12 +97,14 @@ int main(int, char**)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
+
+    ImFont* font = io.Fonts->AddFontFromFileTTF("JetBrainsMono-Regular.ttf", FONT_SIZE * monitor_width_dpi_scale);
+    ImGui::GetStyle().ScaleAllSizes(monitor_width_dpi_scale);
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -89,6 +115,7 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    // Default images
     Image bg_image;
     unsigned char* bg_img = stbi_load(".\\imgs\\background.png", &bg_image.width, &bg_image.height, NULL, 4);
     if (bg_img == NULL)
@@ -135,6 +162,8 @@ int main(int, char**)
     // Create a texture to display blended image
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, blended_image.width, blended_image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, blended_image.image_data);
 
+    ImGui::FileBrowser fileDialog;
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -154,49 +183,40 @@ int main(int, char**)
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+        // 3. Show image
         {
-            static float f = 0.0f;
-            static int counter = 0;
+            ImGui::PushFont(font);
+            ImGui::Begin("OpenGL Image Blender");
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+            if (ImGui::Button("Select background image...")) { fileDialog.Open(BG_IMG_ID); }
+            if (ImGui::Button("Select foreground image...")) { fileDialog.Open(FG_IMG_ID); }
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+            fileDialog.Display();
+            if (fileDialog.HasSelected()) {
+                int width, height;
+                int selected_file = -1;
+                std::string filename = fileDialog.GetSelected(&selected_file).string();
+                unsigned char* data = stbi_load(filename.c_str(), &width, &height, NULL, RGBA_SIZE);
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+                if (selected_file == FG_IMG_ID) {
+                    if (NULL != data) {
+                        fg_image.width = width;
+                        fg_image.height = height;
+                        fg_image.image_data = data; 
+                    }
+                }
 
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+                if (selected_file == BG_IMG_ID) {
+                    if (NULL != data) {
+                        bg_image.width = width;
+                        bg_image.height = height;
+                        bg_image.image_data = data;
+                    }
+                }
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
+                fileDialog.ClearSelected();
+            }
 
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
-
-        // 4. Show image
-        {
-            BlendRawImages(&bg_image, &fg_image, fg_image_pos_x, fg_image_pos_y, blending_modes_enum[current_mode], &blended_image);
-            //stbi_write_png(".\\blend.png", blended_image.width, blended_image.height, 4, blended_image.image_data, blended_image.width * RGBA_SIZE);
-
-            glBindTexture(GL_TEXTURE_2D, blended_texture);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, blended_image.width, blended_image.height, GL_RGBA,
-                GL_UNSIGNED_BYTE, blended_image.image_data);
-
-            ImGui::Begin("OpenGL Texture Test");
             ImGui::Text("pointer = %x", blended_texture);
             ImGui::Text("size = %d x %d", blended_image.width, blended_image.height);
 
@@ -204,9 +224,20 @@ int main(int, char**)
             ImGui::SliderInt("FG image x", &fg_image_pos_x, -1 * bg_image.width, bg_image.width);
             ImGui::SliderInt("FG image y", &fg_image_pos_y, -1 * bg_image.height, bg_image.width);
 
-            ImGui::ListBox("listbox", &current_mode, blending_modes_strings, IM_ARRAYSIZE(blending_modes_strings), 4);
+            ImGui::ListBox("listbox", &current_mode, blending_modes_strings, IM_ARRAYSIZE(blending_modes_strings));
+
+            // Update texture to new blended image
+            BlendRawImages(&bg_image, &fg_image, fg_image_pos_x, fg_image_pos_y, blending_modes_enum[current_mode], &blended_image);
+            glBindTexture(GL_TEXTURE_2D, blended_texture);
+            glTexSubImage2D(
+                GL_TEXTURE_2D, 0, 0, 0, 
+                blended_image.width, blended_image.height,
+                GL_RGBA, GL_UNSIGNED_BYTE, blended_image.image_data
+            );
             ImGui::Image((void*)(intptr_t)blended_texture, ImVec2(blended_image.width, blended_image.height));
+
             ImGui::End();
+            ImGui::PopFont();
         }
 
         // Rendering

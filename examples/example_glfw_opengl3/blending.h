@@ -1,9 +1,8 @@
 #pragma once
-#define IN
-#define OUT
 #define RGBA_SIZE (4)
 #define GL_CLAMP_TO_EDGE 0x812F
 
+#include "defs.h"
 #include <stdint.h>
 
 typedef struct T_Image

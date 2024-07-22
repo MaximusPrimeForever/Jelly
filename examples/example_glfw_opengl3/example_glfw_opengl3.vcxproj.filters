@@ -37,6 +37,9 @@
     <ClCompile Include="blending.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="window_init.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -58,6 +61,15 @@
       <Filter>sources</Filter>
     </ClInclude>
     <ClInclude Include="blending.h">
+      <Filter>sources</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>sources</Filter>
+    </ClInclude>
+    <ClInclude Include="window_init.h">
+      <Filter>sources</Filter>
+    </ClInclude>
+    <ClInclude Include="defs.h">
       <Filter>sources</Filter>
     </ClInclude>
   </ItemGroup>
