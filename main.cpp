@@ -5,7 +5,6 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
 #include "imfilebrowser.h"
 
 // OpenGL/GLFW
@@ -103,7 +102,9 @@ int main(int, char**)
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
-    ImFont* font = io.Fonts->AddFontFromFileTTF("JetBrainsMono-Regular.ttf", FONT_SIZE * monitor_width_dpi_scale);
+    // Apply DPI scale to font and UI elements 
+
+    ImFont* font = io.Fonts->AddFontFromFileTTF(".\\fonts\\JetBrainsMono-Regular.ttf", FONT_SIZE * monitor_width_dpi_scale);
     ImGui::GetStyle().ScaleAllSizes(monitor_width_dpi_scale);
 
     // Setup Platform/Renderer backends
@@ -111,8 +112,7 @@ int main(int, char**)
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Our state
-    bool show_demo_window = false;
-    bool show_another_window = false;
+    bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Default images
