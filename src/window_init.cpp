@@ -13,6 +13,5 @@ bool GetMonitorDimensions(OUT int* width, OUT int* height, OUT float* width_scal
     glfwGetMonitorContentScale(primary_monitor, width_scale, height_scale);
     *width = mode->width;
     *height = mode->height;
-
     return true;
 }
