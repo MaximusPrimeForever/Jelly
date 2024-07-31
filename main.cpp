@@ -24,7 +24,7 @@
 
 #include "blending.h"
 #include "settings.h"
-#include "window_init.h"
+#include "window_utils.h"
 
 #define BG_IMG_ID (1)
 #define FG_IMG_ID (2)
@@ -124,28 +124,12 @@ int main(int, char**)
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    // Default images
-    Image bg_image;
-    unsigned char* bg_img = stbi_load(".\\imgs\\background.png", &bg_image.width, &bg_image.height, NULL, 4);
-    if (bg_img == NULL)
-        return false;
-
-    bg_image.opacity = 1.0;
-    bg_image.image_data = bg_img;
-
-	// Load teapot
-    Image fg_image;
-    unsigned char* fg_img = stbi_load(".\\imgs\\teapot.png", &fg_image.width, &fg_image.height, NULL, 4);
-    if (fg_img == NULL)
-        return false;
-
-    fg_image.opacity = 1.0;
-    fg_image.image_data = fg_img;
+    // Load default images
     int fg_image_pos_x = 0;
     int fg_image_pos_y = 0;
-
-    Image blended_image;
-    // Create an OpenGL texture
+    Image bg_image, fg_image, blended_image;
+    if (!LoadDefaultImages(&bg_image, &fg_image)) { return false; }
+    
     GLuint blended_texture = 0;
     glGenTextures(1, &blended_texture);
 
@@ -186,6 +170,8 @@ int main(int, char**)
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
+
+        ProcessInput(window);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();

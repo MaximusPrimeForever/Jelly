@@ -8,18 +8,6 @@
 #include <utility>
 #include <algorithm>
 
-float clamp(float color)
-{
-    if (color > 1.0) {
-        return 1.0;
-    }
-    if (color < 0.0) {
-        return 0.0;
-    }
-
-    return color;
-}
-
 // Simple helper function to load an image into a OpenGL texture with common settings
 bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_width, int* out_height)
 {

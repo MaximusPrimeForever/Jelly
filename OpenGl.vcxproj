@@ -135,7 +135,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\blending.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\window_init.cpp" />
+    <ClCompile Include="src\window_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_allegro5.h" />
@@ -160,7 +160,8 @@
     <ClInclude Include="backends\imgui_impl_win32.h" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\KHR\khrplatform.h" />
-    <ClInclude Include="libs\emscripten\emscripten_mainloop_stub.h" />
+    <ClInclude Include="include\settings.h" />
+    <ClInclude Include="include\window_utils.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3native.h" />
     <ClInclude Include="libs\glfw\include_3\glfw\glfw3.h" />
@@ -174,10 +175,8 @@
     <ClInclude Include="src\blending.h" />
     <ClInclude Include="src\defs.h" />
     <ClInclude Include="src\imfilebrowser.h" />
-    <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\stb_image_write.h" />
-    <ClInclude Include="src\window_init.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
