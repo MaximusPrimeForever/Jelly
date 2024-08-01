@@ -89,7 +89,7 @@
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\Projects\GP-Exercises\GP-ex0\libs\glfw\include;$(ProjectDir)\include;$(ProjectDir)\backends;$(ProjectDir)\libs\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\backends;$(ProjectDir)\libs\glfw\include;$(ProjectDir)\libs\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -133,9 +133,10 @@
     <ClCompile Include="libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_window.cpp" />
     <ClCompile Include="src\blending.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\window_utils.cpp" />
+    <ClCompile Include="src\Widgets\image_compositor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_allegro5.h" />
@@ -161,7 +162,8 @@
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\settings.h" />
-    <ClInclude Include="include\window_utils.h" />
+    <ClInclude Include="include\widgets\base_widget.h" />
+    <ClInclude Include="include\widgets\image_compositor.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3native.h" />
     <ClInclude Include="libs\glfw\include_3\glfw\glfw3.h" />
@@ -172,7 +174,7 @@
     <ClInclude Include="libs\imgui\include\imstb_rectpack.h" />
     <ClInclude Include="libs\imgui\include\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\include\imstb_truetype.h" />
-    <ClInclude Include="src\blending.h" />
+    <ClInclude Include="main_window.h" />
     <ClInclude Include="src\defs.h" />
     <ClInclude Include="src\imfilebrowser.h" />
     <ClInclude Include="src\stb_image.h" />

@@ -18,7 +18,8 @@ typedef enum e_BlendingMode
     ADD = 0,
     SCREEN,
     MULTIPLY,
-    NORMAL
+    NORMAL,
+    BLENDING_MODE_COUNT
 } BlendingMode;
 
 bool BlendRawImages(

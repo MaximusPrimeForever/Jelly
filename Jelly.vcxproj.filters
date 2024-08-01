@@ -19,14 +19,26 @@
     <Filter Include="Source Files\aux">
       <UniqueIdentifier>{51e31074-6e14-4e69-aaea-ee5ffaa89b3c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer">
-      <UniqueIdentifier>{0b66e4e7-46d1-410e-8f81-0c5f27602b26}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\imgui">
       <UniqueIdentifier>{39a234f1-dd50-4377-a5a1-46eeebc61b9a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\glfw3">
       <UniqueIdentifier>{ede22f3b-6d19-4a94-a7f5-d59e84660625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\window">
+      <UniqueIdentifier>{9907a616-939e-46ff-ab4c-2a1aafcda4ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\rendering">
+      <UniqueIdentifier>{0b66e4e7-46d1-410e-8f81-0c5f27602b26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\window">
+      <UniqueIdentifier>{07ddd891-d240-4a97-adc0-9b00fcb1a571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\widgets">
+      <UniqueIdentifier>{207c19c2-1cec-4bc7-a7cc-918326229b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\widgets">
+      <UniqueIdentifier>{1aa94067-f8af-474d-8903-18bd0fabb53a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,11 +69,14 @@
     <ClCompile Include="src\blending.cpp">
       <Filter>Source Files\aux</Filter>
     </ClCompile>
-    <ClCompile Include="src\window_utils.cpp">
-      <Filter>Source Files\aux</Filter>
-    </ClCompile>
     <ClCompile Include="src\glad.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main_window.cpp">
+      <Filter>Source Files\window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Widgets\image_compositor.cpp">
+      <Filter>Source Files\widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,10 +93,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\defs.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\blending.h">
-      <Filter>Header Files\Renderer</Filter>
+      <Filter>Header Files\rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\imfilebrowser.h">
       <Filter>Header Files\imgui</Filter>
@@ -177,10 +189,16 @@
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
     <ClInclude Include="include\settings.h">
-      <Filter>Header Files\Renderer</Filter>
+      <Filter>Header Files\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="include\window_utils.h">
-      <Filter>Header Files\Renderer</Filter>
+    <ClInclude Include="main_window.h">
+      <Filter>Header Files\window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\widgets\base_widget.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\widgets\image_compositor.h">
+      <Filter>Header Files\widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
