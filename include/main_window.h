@@ -1,8 +1,6 @@
 #pragma once
 
-#include "defs.h"
 #include "imgui.h"
-
 #include "widgets/image_compositor.h"
 
 typedef struct Monitor_t
@@ -18,18 +16,25 @@ class MainWindow
 private:
 	GLFWwindow* window;
 	const char* glsl_version;
-	Monitor MonitorDimensions;
+	Monitor monitorDimensions;
 	ImVec4 background_color;
 
 	// Widgets
 	ImageCompositor* im_comp;
 	ImFont* font;
 
+	// OpenGL
+	GLuint VAO;
+	GLuint shaderProgram;
+
 	void InitializeGlfw();
 	void InitializeImGui();
 	
 	bool GetMonitorDimensions();
 	void ProcessInput();
+	void ShowImGui();
+	void RenderOpenGL();
+	void SetupOpenGL();
 public:
 	MainWindow();
 	~MainWindow();

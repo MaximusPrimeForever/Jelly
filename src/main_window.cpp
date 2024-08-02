@@ -1,5 +1,6 @@
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
+#include <fstream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
@@ -11,6 +12,11 @@
 
 #include "settings.h"
 #include "main_window.h"
+
+#include <GL/gl.h>
+
+#include "io/file_io.h"
+#include "io/shaders.h"
 
 
 MainWindow::MainWindow()
@@ -26,6 +32,8 @@ MainWindow::MainWindow()
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(this->window, true);
 	ImGui_ImplOpenGL3_Init(this->glsl_version);
+
+	this->SetupOpenGL();
 
 	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
 	this->background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -61,7 +69,7 @@ void MainWindow::InitializeGlfw()
 
 	// Create window with graphics context
 	this->GetMonitorDimensions();
-	if (this->MonitorDimensions.width_dpi_scale != this->MonitorDimensions.height_dpi_scale) {
+	if (this->monitorDimensions.width_dpi_scale != this->monitorDimensions.height_dpi_scale) {
 		throw std::exception(
 			"Width and height DPI scales are different. "
 			"No idea how to handle that. fuck you"
@@ -69,8 +77,8 @@ void MainWindow::InitializeGlfw()
 	}
 
 	this->window = glfwCreateWindow(
-		this->MonitorDimensions.width * WINDOW_WIDTH_REL_SCALE,
-		this->MonitorDimensions.height * WINDOW_HEIGHT_REL_SCALE,
+		this->monitorDimensions.width * WINDOW_WIDTH_REL_SCALE,
+		this->monitorDimensions.height * WINDOW_HEIGHT_REL_SCALE,
 		APP_NAME,
 		nullptr,
 		nullptr
@@ -96,8 +104,8 @@ void MainWindow::InitializeImGui()
 
 	// Apply DPI scale to font and UI elements 
 	// TODO: check font path before loading.
-	this->font = io.Fonts->AddFontFromFileTTF(".\\fonts\\JetBrainsMono-Regular.ttf", FONT_SIZE * this->MonitorDimensions.height_dpi_scale);
-	ImGui::GetStyle().ScaleAllSizes(this->MonitorDimensions.height_dpi_scale);
+	this->font = io.Fonts->AddFontFromFileTTF(".\\fonts\\JetBrainsMono-Regular.ttf", FONT_SIZE * this->monitorDimensions.height_dpi_scale);
+	ImGui::GetStyle().ScaleAllSizes(this->monitorDimensions.height_dpi_scale);
 }
 
 bool MainWindow::GetMonitorDimensions()
@@ -107,11 +115,11 @@ bool MainWindow::GetMonitorDimensions()
 
 	glfwGetMonitorContentScale(
 		primary_monitor, 
-		&this->MonitorDimensions.width_dpi_scale, 
-		&this->MonitorDimensions.height_dpi_scale
+		&this->monitorDimensions.width_dpi_scale, 
+		&this->monitorDimensions.height_dpi_scale
 	);
-	this->MonitorDimensions.width = mode->width;
-	this->MonitorDimensions.height = mode->height;
+	this->monitorDimensions.width = mode->width;
+	this->monitorDimensions.height = mode->height;
 	return true;
 }
 
@@ -129,28 +137,83 @@ bool MainWindow::ShouldClose()
 
 void MainWindow::Show()
 {
+	// React to user input
     glfwPollEvents();
     this->ProcessInput();
 
-    // Start the Dear ImGui frame
+	// Ready ImGui windows for rendering
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    ImGui::ShowDemoWindow();
-
-	// 2. Show image compositor
-	this->im_comp->Show();
-
-    // Rendering
+	this->ShowImGui();
     ImGui::Render();
-    int display_w, display_h;
-    glfwGetFramebufferSize(window, &display_w, &display_h);
-    glViewport(0, 0, display_w, display_h);
+
+	// Clear rendering(??) buffer
+    glViewport(0, 0, this->monitorDimensions.width, this->monitorDimensions.height);
     glClearColor(background_color.x * background_color.w, background_color.y * background_color.w, background_color.z * background_color.w, background_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
+	// Render
+	this->RenderOpenGL();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
+}
+
+void MainWindow::ShowImGui()
+{
+	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	ImGui::ShowDemoWindow();
+
+	// 2. Show image compositor
+	//this->im_comp->Show();
+}
+
+void MainWindow::RenderOpenGL()
+{
+	glUseProgram(this->shaderProgram);
+	glBindVertexArray(this->VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void MainWindow::SetupOpenGL()
+{
+	GLuint vertexShader = CompileShader(".\\shaders\\vertex.glsl", GL_VERTEX_SHADER);
+	if (!vertexShader) { throw std::exception("Failed to compile vertex shader"); }
+
+	GLuint fragShader = CompileShader(".\\shaders\\frag.glsl", GL_FRAGMENT_SHADER);
+	if (!fragShader) { throw std::exception("Failed to compile fragment shader"); }
+
+	this->shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragShader);
+	glLinkProgram(shaderProgram);
+
+	GLint linkSuccess;
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linkSuccess);
+	if (!linkSuccess) {
+		char compilationOutput[1024];
+		glGetProgramInfoLog(shaderProgram, sizeof(compilationOutput), NULL, compilationOutput);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << compilationOutput << std::endl;
+		throw std::exception("Failed to link shaders.");
+	}
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragShader);
+
+	glGenVertexArrays(1, &this->VAO);
+	glBindVertexArray(this->VAO);
+	
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.0f,  0.5f, 0.0f
+	};
+
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 }

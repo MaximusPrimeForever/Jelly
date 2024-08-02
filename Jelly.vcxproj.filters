@@ -16,9 +16,6 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{b4909501-0f38-447c-b625-eeaecde49141}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\aux">
-      <UniqueIdentifier>{51e31074-6e14-4e69-aaea-ee5ffaa89b3c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\imgui">
       <UniqueIdentifier>{39a234f1-dd50-4377-a5a1-46eeebc61b9a}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,15 @@
     </Filter>
     <Filter Include="Header Files\widgets">
       <UniqueIdentifier>{1aa94067-f8af-474d-8903-18bd0fabb53a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{d48657ca-bfb4-48ea-9fd7-adc62835fb37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\io">
+      <UniqueIdentifier>{51e31074-6e14-4e69-aaea-ee5ffaa89b3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\io">
+      <UniqueIdentifier>{ebb6db3f-8a04-4013-8a60-23188d01c1bf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -67,16 +73,22 @@
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
     <ClCompile Include="src\blending.cpp">
-      <Filter>Source Files\aux</Filter>
+      <Filter>Source Files\io</Filter>
     </ClCompile>
     <ClCompile Include="src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main_window.cpp">
-      <Filter>Source Files\window</Filter>
-    </ClCompile>
     <ClCompile Include="src\Widgets\image_compositor.cpp">
       <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main_window.cpp">
+      <Filter>Source Files\window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\io\shaders.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="src\io\file_io.cpp">
+      <Filter>Source Files\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -191,17 +203,29 @@
     <ClInclude Include="include\settings.h">
       <Filter>Header Files\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="main_window.h">
-      <Filter>Header Files\window</Filter>
-    </ClInclude>
     <ClInclude Include="include\widgets\base_widget.h">
       <Filter>Header Files\widgets</Filter>
     </ClInclude>
     <ClInclude Include="include\widgets\image_compositor.h">
       <Filter>Header Files\widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\main_window.h">
+      <Filter>Header Files\window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\io\file_io.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="include\io\shaders.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
+    <None Include="shaders\vertex.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

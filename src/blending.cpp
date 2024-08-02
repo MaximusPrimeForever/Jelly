@@ -3,9 +3,8 @@
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 #include "blending.h"
-#include <math.h>
+
 #include <malloc.h>
-#include <utility>
 #include <algorithm>
 
 // Simple helper function to load an image into a OpenGL texture with common settings
