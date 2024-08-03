@@ -7,7 +7,30 @@
 
 #include "superglue.h"
 
-GLuint CompileShader(const char* shader_filepath, GLenum shader_type)
+ShaderProgram::ShaderProgram(Shader* shaders, size_t count)
+{
+	this->id = ShaderProgram::BuildProgram(shaders,count, true);
+}
+
+void ShaderProgram::Use() const
+{
+	glUseProgram(this->id);
+}
+
+void ShaderProgram::SetBool(const std::string& name, bool value) const
+{
+	glUniform1i(glGetUniformLocation(this->id, name.c_str()), (int)value);
+}
+void ShaderProgram::SetInt(const std::string& name, int value) const
+{
+	glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
+}
+void ShaderProgram::SetFloat(const std::string& name, float value) const
+{
+	glUniform1f(glGetUniformLocation(this->id, name.c_str()), value);
+}
+
+GLuint ShaderProgram::CompileShader(const char* shader_filepath, GLenum shader_type)
 {
 	std::string file_contents = read_file_contents(shader_filepath);
 	const char* shaderCode = file_contents.c_str();
@@ -28,7 +51,7 @@ GLuint CompileShader(const char* shader_filepath, GLenum shader_type)
 	return shader;
 }
 
-GLuint BuildProgram(Shader* shaders, size_t count, bool shouldCleanUp)
+GLuint ShaderProgram::BuildProgram(Shader* shaders, size_t count, bool shouldCleanUp)
 {
 	GLuint shader_program = glCreateProgram();
 

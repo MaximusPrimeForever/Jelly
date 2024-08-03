@@ -5,6 +5,7 @@
 
 #include "widgets/image_compositor.h"
 #include "widgets/settings_menu.h"
+#include "io/shaders.h"
 
 typedef struct Monitor_t
 {
@@ -31,7 +32,7 @@ private:
 
 	// OpenGL
 	GLuint VAO[2];
-	GLuint shaderProgram;
+	ShaderProgram* shader_program;
 
 
 	void InitializeGlfw();

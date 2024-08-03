@@ -168,7 +168,7 @@ void MainWindow::ShowImGui()
 	ImGui::ShowDemoWindow();
 
 	// Show image compositor
-	if (this->settings_menu->showImageCompositor)
+	if (this->settings_menu->show_image_compositor)
 	{
 		this->im_comp->Show();
 	}
@@ -176,7 +176,7 @@ void MainWindow::ShowImGui()
 
 void MainWindow::RenderOpenGL()
 {
-	if (this->settings_menu->enableWireframe) {
+	if (this->settings_menu->enable_wireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -185,7 +185,7 @@ void MainWindow::RenderOpenGL()
 	//float timeValue = glfwGetTime();
 	//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 	//int vertexColorLocation = glGetUniformLocation(this->shaderProgram, "ourColor");
-	glUseProgram(this->shaderProgram);
+	this->shader_program->Use();
 
 	//glUniform4f(vertexColorLocation,
 	//	(sin(timeValue + 1.0) / 2.0f) + 0.5f, 
@@ -195,6 +195,7 @@ void MainWindow::RenderOpenGL()
 	//);
 
 	glBindVertexArray(this->VAO[0]);
+	this->shader_program->SetFloat("horizontal_offset", this->settings_menu->horizontal_offset);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -207,7 +208,7 @@ void MainWindow::SetupOpenGL()
 		Shader{".\\shaders\\vertex.glsl", GL_VERTEX_SHADER, 0},
 		Shader{".\\shaders\\frag.glsl", GL_FRAGMENT_SHADER, 0},
 	};
-	this->shaderProgram = BuildProgram(shader_paths, sizeof(shader_paths) / sizeof(Shader), true);
+	this->shader_program = new ShaderProgram(shader_paths, sizeof(shader_paths) / sizeof(Shader));
 
 	// Begin VAO
 	glGenVertexArrays(2, this->VAO);
