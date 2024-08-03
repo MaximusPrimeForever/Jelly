@@ -3,6 +3,8 @@
 #include "io/file_io.h"
 #include "io/shaders.h"
 
+#include "imgui_impl_opengl3_loader.h"
+
 GLuint CompileShader(const char* shader_filepath, GLenum shader_type)
 {
 	std::string file_contents = read_file_contents(shader_filepath);

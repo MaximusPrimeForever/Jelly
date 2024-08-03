@@ -90,6 +90,9 @@
     <ClCompile Include="src\io\file_io.cpp">
       <Filter>Source Files\io</Filter>
     </ClCompile>
+    <ClCompile Include="src\Widgets\settings_menu.cpp">
+      <Filter>Source Files\widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\stb_image.h">
@@ -217,6 +220,12 @@
     </ClInclude>
     <ClInclude Include="include\io\shaders.h">
       <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="include\widgets\settings_menu.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\superglue.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

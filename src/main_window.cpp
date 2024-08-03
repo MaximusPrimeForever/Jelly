@@ -2,8 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+#include "superglue.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -13,11 +12,7 @@
 #include "settings.h"
 #include "main_window.h"
 
-#include <GL/gl.h>
-
-#include "io/file_io.h"
 #include "io/shaders.h"
-
 
 MainWindow::MainWindow()
 {
@@ -35,7 +30,10 @@ MainWindow::MainWindow()
 
 	this->SetupOpenGL();
 
+	// Setup ImGui widgets
 	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
+	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
+
 	this->background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
@@ -141,17 +139,19 @@ void MainWindow::Show()
     glfwPollEvents();
     this->ProcessInput();
 
+	// Clear previous frame
+	int display_w, display_h;
+	glfwGetFramebufferSize(window, &display_w, &display_h);
+	glViewport(0, 0, display_w, display_h);
+    glClearColor(background_color.x * background_color.w, background_color.y * background_color.w, background_color.z * background_color.w, background_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
 	// Ready ImGui windows for rendering
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 	this->ShowImGui();
     ImGui::Render();
-
-	// Clear rendering(??) buffer
-    glViewport(0, 0, this->monitorDimensions.width, this->monitorDimensions.height);
-    glClearColor(background_color.x * background_color.w, background_color.y * background_color.w, background_color.z * background_color.w, background_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
 
 	// Render
 	this->RenderOpenGL();
@@ -162,18 +162,32 @@ void MainWindow::Show()
 
 void MainWindow::ShowImGui()
 {
-	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	this->settings_menu->Show();
+
+	// Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	ImGui::ShowDemoWindow();
 
-	// 2. Show image compositor
-	//this->im_comp->Show();
+	// Show image compositor
+	if (this->settings_menu->showImageCompositor)
+	{
+		this->im_comp->Show();
+	}
 }
 
 void MainWindow::RenderOpenGL()
 {
+	if (this->settings_menu->enableWireframe) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	} else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
 	glUseProgram(this->shaderProgram);
 	glBindVertexArray(this->VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glBindVertexArray(0);
 }
 
 void MainWindow::SetupOpenGL()
@@ -200,19 +214,31 @@ void MainWindow::SetupOpenGL()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragShader);
 
+	// Begin VAO
 	glGenVertexArrays(1, &this->VAO);
 	glBindVertexArray(this->VAO);
 	
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
+		 0.5f,  0.5f, 0.0f,  // top right
+		 0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left 
+	};
+	unsigned int indices[] = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
 	};
 
+	// Vertices VBO
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);

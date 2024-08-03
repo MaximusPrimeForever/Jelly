@@ -1,14 +1,12 @@
 #pragma once
-#include <iostream>
-#include "base_widget.h"
+
 #include "blending.h"
-#include "settings.h"
+#include "base_widget.h"
 
 #define BG_IMG_ID (1)
 #define FG_IMG_ID (2)
 #include "imfilebrowser.h"
 
-#include <imgui_impl_opengl3.h>
 
 class ImageCompositor : BaseWidget
 {

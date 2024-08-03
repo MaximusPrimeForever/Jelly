@@ -1,7 +1,10 @@
 #pragma once
 
 #include "imgui.h"
+#include "superglue.h"
+
 #include "widgets/image_compositor.h"
+#include "widgets/settings_menu.h"
 
 typedef struct Monitor_t
 {
@@ -19,6 +22,9 @@ private:
 	Monitor monitorDimensions;
 	ImVec4 background_color;
 
+	// Settings
+	SettingsMenu* settings_menu;
+
 	// Widgets
 	ImageCompositor* im_comp;
 	ImFont* font;
@@ -26,6 +32,7 @@ private:
 	// OpenGL
 	GLuint VAO;
 	GLuint shaderProgram;
+
 
 	void InitializeGlfw();
 	void InitializeImGui();

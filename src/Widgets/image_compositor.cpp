@@ -7,7 +7,10 @@
 #include <malloc.h>
 #include <algorithm>
 
+#include "superglue.h"
 #include "widgets/image_compositor.h"
+
+#include "settings.h"
 
 ImageCompositor::ImageCompositor(double x_pos, double y_pos, ImFont* font, bool should_load_default_images)
     :BaseWidget(x_pos, y_pos, font),

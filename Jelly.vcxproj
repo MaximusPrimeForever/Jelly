@@ -138,6 +138,7 @@
     <ClCompile Include="src\io\shaders.cpp" />
     <ClCompile Include="src\main_window.cpp" />
     <ClCompile Include="src\Widgets\image_compositor.cpp" />
+    <ClCompile Include="src\Widgets\settings_menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_allegro5.h" />
@@ -166,8 +167,10 @@
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\main_window.h" />
     <ClInclude Include="include\settings.h" />
+    <ClInclude Include="include\superglue.h" />
     <ClInclude Include="include\widgets\base_widget.h" />
     <ClInclude Include="include\widgets\image_compositor.h" />
+    <ClInclude Include="include\widgets\settings_menu.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3native.h" />
     <ClInclude Include="libs\glfw\include_3\glfw\glfw3.h" />

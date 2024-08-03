@@ -1,6 +1,6 @@
 #pragma once
-#include <glad/glad.h>
+
+#include "superglue.h"
 
 GLuint CompileShader(const char* shader_filepath, GLenum shader_type);
-
 GLuint LinkProgram();

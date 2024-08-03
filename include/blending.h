@@ -5,6 +5,8 @@
 #include "defs.h"
 #include <stdint.h>
 
+#include "superglue.h"
+
 typedef struct T_Image
 {
     int width;

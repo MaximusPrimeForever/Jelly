@@ -1,6 +1,6 @@
 // STB
 #include "stb_image.h"
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+#include "superglue.h"
 
 #include "blending.h"
 
