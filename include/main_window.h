@@ -30,7 +30,7 @@ private:
 	ImFont* font;
 
 	// OpenGL
-	GLuint VAO;
+	GLuint VAO[2];
 	GLuint shaderProgram;
 
 
