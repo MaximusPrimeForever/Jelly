@@ -46,6 +46,15 @@
     <Filter Include="Header Files\io">
       <UniqueIdentifier>{ebb6db3f-8a04-4013-8a60-23188d01c1bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics">
+      <UniqueIdentifier>{003155fd-d7f8-42a1-b21c-44858bb7c7e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics">
+      <UniqueIdentifier>{2afa1e3d-a873-4f27-b537-d279435ec8a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics\examples">
+      <UniqueIdentifier>{622d8c67-294c-461d-a7e8-7fbc633784ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -84,14 +93,14 @@
     <ClCompile Include="src\main_window.cpp">
       <Filter>Source Files\window</Filter>
     </ClCompile>
-    <ClCompile Include="src\io\shaders.cpp">
-      <Filter>Source Files\io</Filter>
-    </ClCompile>
     <ClCompile Include="src\io\file_io.cpp">
       <Filter>Source Files\io</Filter>
     </ClCompile>
     <ClCompile Include="src\Widgets\settings_menu.cpp">
       <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\shaders.cpp">
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -218,14 +227,20 @@
     <ClInclude Include="include\io\file_io.h">
       <Filter>Header Files\io</Filter>
     </ClInclude>
-    <ClInclude Include="include\io\shaders.h">
-      <Filter>Header Files\io</Filter>
-    </ClInclude>
     <ClInclude Include="include\widgets\settings_menu.h">
       <Filter>Header Files\widgets</Filter>
     </ClInclude>
     <ClInclude Include="include\superglue.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\shaders.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\render_target.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\examples\texured_rectangle.h">
+      <Filter>Source Files\graphics\examples</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -236,5 +251,10 @@
     <None Include="shaders\frag.glsl">
       <Filter>Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\JetBrainsMono-Regular.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
   </ItemGroup>
 </Project>

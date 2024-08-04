@@ -3,9 +3,14 @@
 #include "imgui.h"
 #include "superglue.h"
 
+#include "graphics/shaders.h"
+#include "graphics/render_target.h"
+
 #include "widgets/image_compositor.h"
 #include "widgets/settings_menu.h"
-#include "io/shaders.h"
+
+#define RENDER_TARGETS_COUNT (100)
+
 
 typedef struct Monitor_t
 {
@@ -31,8 +36,7 @@ private:
 	ImFont* font;
 
 	// OpenGL
-	GLuint VAO[2];
-	ShaderProgram* shader_program;
+	RenderTarget* render_targets[RENDER_TARGETS_COUNT] = { 0 };
 
 
 	void InitializeGlfw();

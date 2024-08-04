@@ -12,7 +12,13 @@
 #include "settings.h"
 #include "main_window.h"
 
-#include "io/shaders.h"
+#include <stb_image.h>
+
+#include "graphics/shaders.h"
+#include "texured_rectangle.h"
+
+
+#define TEXTURED_RECTANGLE_INDEX (0)
 
 MainWindow::MainWindow()
 {
@@ -21,7 +27,6 @@ MainWindow::MainWindow()
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw std::exception("Failed to initialize GLAD. Aborting..");
 	}
-
 	this->InitializeImGui();
 
 	// Setup Platform/Renderer backends
@@ -182,57 +187,29 @@ void MainWindow::RenderOpenGL()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
-	//float timeValue = glfwGetTime();
-	//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-	//int vertexColorLocation = glGetUniformLocation(this->shaderProgram, "ourColor");
-	this->shader_program->Use();
+	for (int i = 0; i < RENDER_TARGETS_COUNT; ++i)
+	{
+		RenderTarget* current_target = this->render_targets[i];
+		if (current_target != NULL)
+		{
+			switch (i)
+			{
+			case TEXTURED_RECTANGLE_INDEX:
+				{
+					TexturedRectangle* tex_rect = (TexturedRectangle*)current_target;
+					tex_rect->horizontal_offset = this->settings_menu->horizontal_offset;
+					break;
+				}
+			default:
+				break;
+			}
 
-	//glUniform4f(vertexColorLocation,
-	//	(sin(timeValue + 1.0) / 2.0f) + 0.5f, 
-	//	(sin(timeValue + 2.0) / 2.0f) + 0.5f, 
-	//	(sin(timeValue + 3.0) / 2.0f) + 0.5f, 
-	//	1.0f
-	//);
-
-	glBindVertexArray(this->VAO[0]);
-	this->shader_program->SetFloat("horizontal_offset", this->settings_menu->horizontal_offset);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	glBindVertexArray(0);
+			current_target->Render();
+		}
+	}
 }
 
 void MainWindow::SetupOpenGL()
 {
-	Shader shader_paths[] = {
-		Shader{".\\shaders\\vertex.glsl", GL_VERTEX_SHADER, 0},
-		Shader{".\\shaders\\frag.glsl", GL_FRAGMENT_SHADER, 0},
-	};
-	this->shader_program = new ShaderProgram(shader_paths, sizeof(shader_paths) / sizeof(Shader));
-
-	// Begin VAO
-	glGenVertexArrays(2, this->VAO);
-	glBindVertexArray(this->VAO[0]);
-	
-	float vertices[] = {
-		// positions         // colors
-		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
-	};
-
-	// Triangle VBO
-	GLuint vbo[2];
-	glGenBuffers(2, vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// Vertices
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (sizeof(float) * 3));
-	glEnableVertexAttribArray(1);
-
+	this->render_targets[TEXTURED_RECTANGLE_INDEX] = (RenderTarget*) new TexturedRectangle();
 }

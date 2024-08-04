@@ -89,7 +89,7 @@
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\backends;$(ProjectDir)\libs\glfw\include;$(ProjectDir)\libs\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\backends;$(ProjectDir)\libs\glfw\include;$(ProjectDir)\libs\imgui\include;$(ProjectDir)\src\graphics\examples;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -135,7 +135,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\blending.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\io\shaders.cpp" />
+    <ClCompile Include="src\graphics\shaders.cpp" />
     <ClCompile Include="src\main_window.cpp" />
     <ClCompile Include="src\Widgets\image_compositor.cpp" />
     <ClCompile Include="src\Widgets\settings_menu.cpp" />
@@ -162,8 +162,9 @@
     <ClInclude Include="backends\imgui_impl_wgpu.h" />
     <ClInclude Include="backends\imgui_impl_win32.h" />
     <ClInclude Include="include\glad\glad.h" />
+    <ClInclude Include="include\graphics\render_target.h" />
+    <ClInclude Include="include\graphics\shaders.h" />
     <ClInclude Include="include\io\file_io.h" />
-    <ClInclude Include="include\io\shaders.h" />
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\main_window.h" />
     <ClInclude Include="include\settings.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="libs\imgui\include\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\include\imstb_truetype.h" />
     <ClInclude Include="src\defs.h" />
+    <ClInclude Include="src\graphics\examples\texured_rectangle.h" />
     <ClInclude Include="src\imfilebrowser.h" />
     <ClCompile Include="src\io\file_io.cpp" />
     <ClInclude Include="src\stb_image.h" />
@@ -191,6 +193,9 @@
     <None Include="libs\emscripten\shell_minimal.html" />
     <None Include="shaders\frag.glsl" />
     <None Include="shaders\vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\JetBrainsMono-Regular.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
