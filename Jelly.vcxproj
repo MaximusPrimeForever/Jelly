@@ -162,6 +162,7 @@
     <ClInclude Include="backends\imgui_impl_wgpu.h" />
     <ClInclude Include="backends\imgui_impl_win32.h" />
     <ClInclude Include="include\glad\glad.h" />
+    <ClInclude Include="include\graphics\awesome_gl.h" />
     <ClInclude Include="include\graphics\render_target.h" />
     <ClInclude Include="include\graphics\shaders.h" />
     <ClInclude Include="include\io\file_io.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="libs\imgui\include\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\include\imstb_truetype.h" />
     <ClInclude Include="src\defs.h" />
+    <ClInclude Include="src\graphics\examples\awesome_rectangle.h" />
     <ClInclude Include="src\graphics\examples\texured_rectangle.h" />
     <ClInclude Include="src\imfilebrowser.h" />
     <ClCompile Include="src\io\file_io.cpp" />
@@ -191,7 +193,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
+    <None Include="shaders\awesome_rectangle\frag_aws_rect.glsl" />
+    <None Include="shaders\awesome_rectangle\vertex_aws_rect.glsl" />
     <None Include="shaders\frag.glsl" />
+    <None Include="shaders\textured_rectangle\frag_tex_rect.glsl" />
+    <None Include="shaders\textured_rectangle\vertex_tex_rect.glsl" />
     <None Include="shaders\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>

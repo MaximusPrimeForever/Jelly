@@ -9,7 +9,12 @@
 #include "widgets/image_compositor.h"
 #include "widgets/settings_menu.h"
 
-#define RENDER_TARGETS_COUNT (100)
+typedef enum RENDER_TARGET_ENUM_T
+{
+	TEXTURED_RECTANGLE = 0,
+	AWESOME_RECTANGLE,
+	RENDER_TARGET_COUNT
+} RENDER_TARGET_ENUM;
 
 
 typedef struct Monitor_t
@@ -36,7 +41,7 @@ private:
 	ImFont* font;
 
 	// OpenGL
-	RenderTarget* render_targets[RENDER_TARGETS_COUNT] = { 0 };
+	RenderTarget* render_targets[RENDER_TARGET_COUNT] = { 0 };
 
 
 	void InitializeGlfw();

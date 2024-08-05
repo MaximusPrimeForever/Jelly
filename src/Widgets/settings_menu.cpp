@@ -11,6 +11,7 @@ SettingsMenu::SettingsMenu(double x_pos, double y_pos, ImFont* font) : BaseWidge
 void SettingsMenu::Show()
 {
 	ImGui::PushFont(this->font);
+	ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
 	ImGui::Begin("Settings Menu");
 
 	ImGui::Checkbox("Enable Wireframe", &this->enable_wireframe);

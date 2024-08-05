@@ -1,7 +1,21 @@
 # Jelly
 ![jelly logo](./resources/Prismatic_Jelly.png)
 
-A little renderer written in C++, OpenGL, imgui and love.
+A little renderer written in C++, OpenGL, imgui and love (and a bit of hate).
+
+
+## Future features:
+- [ ] Functional UI.
+- [ ] Basic primitive shapes.
+- [ ] Lighting.
+- [ ] Post-processing effects
+	- [ ] SSAO.
+- [ ] Advanced techniques.
+	- [ ] Ray tracing.
+	- [ ] ???.
+- [ ] Option to load 3D Meshes
+	- [ ] OpenUSD.
+	- [ ] Load [Caldera](https://github.com/Activision/caldera).
 
 
 ## To run

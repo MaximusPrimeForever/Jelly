@@ -14,11 +14,9 @@
 
 #include <stb_image.h>
 
-#include "graphics/shaders.h"
+#include "awesome_rectangle.h"
 #include "texured_rectangle.h"
 
-
-#define TEXTURED_RECTANGLE_INDEX (0)
 
 MainWindow::MainWindow()
 {
@@ -187,14 +185,14 @@ void MainWindow::RenderOpenGL()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
-	for (int i = 0; i < RENDER_TARGETS_COUNT; ++i)
+	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)
 	{
 		RenderTarget* current_target = this->render_targets[i];
 		if (current_target != NULL)
 		{
 			switch (i)
 			{
-			case TEXTURED_RECTANGLE_INDEX:
+			case TEXTURED_RECTANGLE:
 				{
 					TexturedRectangle* tex_rect = (TexturedRectangle*)current_target;
 					tex_rect->horizontal_offset = this->settings_menu->horizontal_offset;
@@ -211,5 +209,6 @@ void MainWindow::RenderOpenGL()
 
 void MainWindow::SetupOpenGL()
 {
-	this->render_targets[TEXTURED_RECTANGLE_INDEX] = (RenderTarget*) new TexturedRectangle();
+	this->render_targets[TEXTURED_RECTANGLE] = (RenderTarget*) new TexturedRectangle();
+	this->render_targets[AWESOME_RECTANGLE] = (RenderTarget*) new AwesomeRectangle();
 }

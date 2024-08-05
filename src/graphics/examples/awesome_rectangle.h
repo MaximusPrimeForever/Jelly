@@ -4,18 +4,17 @@
 #include <graphics/render_target.h>
 
 #include <stb_image.h>
+#include "graphics/awesome_gl.h"
 
 
-class TexturedRectangle : RenderTarget
+class AwesomeRectangle : RenderTarget
 {
 private:
 	GLuint vao;
-	GLuint texture;
+	GLuint texture[2];
 	ShaderProgram* program;
 public:
-	float horizontal_offset;
-
-	TexturedRectangle()
+	AwesomeRectangle()
 	{
 		float vertices[] = {
 		// positions          // colors           // texture coords
@@ -30,11 +29,10 @@ public:
 		};
 
 		Shader shader_paths[] = {
-			Shader{".\\shaders\\textured_rectangle\\vertex_tex_rect.glsl", GL_VERTEX_SHADER, 0},
-			Shader{".\\shaders\\textured_rectangle\\frag_tex_rect.glsl", GL_FRAGMENT_SHADER, 0},
+			Shader{".\\shaders\\awesome_rectangle\\vertex_aws_rect.glsl", GL_VERTEX_SHADER, 0},
+			Shader{".\\shaders\\awesome_rectangle\\frag_aws_rect.glsl", GL_FRAGMENT_SHADER, 0},
 		};
 		this->program = new ShaderProgram(shader_paths, sizeof(shader_paths) / sizeof(Shader));
-		this->horizontal_offset = 0.0;
 
 		GLuint vbo, ebo;
 		glGenVertexArrays(1, &this->vao);
@@ -63,10 +61,10 @@ public:
 		glEnableVertexAttribArray(2);
 
 		int width, height, nrChannels;
-		unsigned char* data = stbi_load(".\\textures\\wood_box.jpg", &width, &height, &nrChannels, 0);
+		glGenTextures(2, this->texture);
 
-		glGenTextures(1, &this->texture);
-		glBindTexture(GL_TEXTURE_2D, this->texture);
+		unsigned char* data = stbi_load(".\\textures\\wood_box.jpg", &width, &height, &nrChannels, 0);
+		glBindTexture(GL_TEXTURE_2D, this->texture[0]);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -75,19 +73,34 @@ public:
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
-
 		stbi_image_free(data);
+		
+		data = stbi_load(".\\textures\\awesomeface.png", &width, &height, &nrChannels, 0);
+		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		stbi_image_free(data);
+
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
+		this->program->SetInt("tex1_data", AGL_SAMPLER_TEXTURE1);
 	}
+
 	void Render() override
 	{
 		this->program->Use();
-
 		glBindVertexArray(this->vao);
-		glBindTexture(GL_TEXTURE_2D, this->texture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, this->texture[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
 
-		this->program->SetFloat("horizontal_offset", this->horizontal_offset);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
