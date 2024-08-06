@@ -10,9 +10,12 @@ SettingsMenu::SettingsMenu(double x_pos, double y_pos, ImFont* font) : BaseWidge
 
 void SettingsMenu::Show()
 {
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
 	ImGui::PushFont(this->font);
 	ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
 	ImGui::Begin("Settings Menu");
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
 	ImGui::Checkbox("Enable Wireframe", &this->enable_wireframe);
 	ImGui::Checkbox("Show ImageCompositor", &this->show_image_compositor);

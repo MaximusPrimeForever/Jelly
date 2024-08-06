@@ -42,7 +42,7 @@ private:
 
 	// OpenGL
 	RenderTarget* render_targets[RENDER_TARGET_COUNT] = { 0 };
-	float mix_value = 0.0;
+	float mix_value = 0.5;
 
 	void InitializeGlfw();
 	void InitializeImGui();
