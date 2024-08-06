@@ -129,6 +129,14 @@ void MainWindow::ProcessInput()
 	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+
+	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
+		this->mix_value += 0.01;
+	}
+	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		this->mix_value -= 0.01;
+	}
+	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
 }
 
 bool MainWindow::ShouldClose()
@@ -198,6 +206,12 @@ void MainWindow::RenderOpenGL()
 					tex_rect->horizontal_offset = this->settings_menu->horizontal_offset;
 					break;
 				}
+			case AWESOME_RECTANGLE:
+			{
+				AwesomeRectangle* tex_rect = (AwesomeRectangle*)current_target;
+				tex_rect->mix_value = this->mix_value;
+				break;
+			}
 			default:
 				break;
 			}
