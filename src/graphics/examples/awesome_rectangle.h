@@ -6,6 +6,10 @@
 #include <stb_image.h>
 #include "graphics/awesome_gl.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 class AwesomeRectangle : RenderTarget
 {
@@ -13,6 +17,7 @@ private:
 	GLuint vao;
 	GLuint texture[2];
 	ShaderProgram* program;
+	glm::mat4 trans_matrix;
 public:
 	float mix_value;
 
@@ -107,6 +112,12 @@ public:
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
 		this->program->SetInt("tex1_data", AGL_SAMPLER_TEXTURE1);
+
+		this->trans_matrix = glm::mat4(1.0f);
+		this->trans_matrix = glm::translate(
+			this->trans_matrix,
+			glm::vec3(0.5, -0.5, 0.0)
+		);
 	}
 
 	void Render() override
@@ -114,6 +125,18 @@ public:
 		this->program->Use();
 
 		this->program->SetFloat("mix_value", this->mix_value);
+		this->trans_matrix = glm::rotate(
+			this->trans_matrix,
+			glm::sin((float)glfwGetTime()) * 0.25f,
+			glm::vec3(0.0, 0.0, 1.0)
+		);
+
+		glUniformMatrix4fv(
+			glGetUniformLocation(this->program->id, "trans"),
+			1,
+			GL_FALSE,
+			glm::value_ptr(this->trans_matrix)
+		);
 
 		glBindVertexArray(this->vao);
 		glActiveTexture(GL_TEXTURE0);

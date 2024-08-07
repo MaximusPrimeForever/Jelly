@@ -5,6 +5,10 @@
 
 #include <stb_image.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 class TexturedRectangle : RenderTarget
 {
@@ -12,6 +16,7 @@ private:
 	GLuint vao;
 	GLuint texture;
 	ShaderProgram* program;
+	glm::mat4 trans;
 public:
 	float horizontal_offset;
 
@@ -79,10 +84,17 @@ public:
 		stbi_image_free(data);
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
+
+		this->trans = glm::mat4(1.0f);
+		this->trans = glm::translate(this->trans, glm::vec3(-0.5, 0.5, 0));
 	}
 	void Render() override
 	{
 		this->program->Use();
+
+		float scale = glm::abs(glm::sin((float)glfwGetTime()));
+		//this->trans = glm::scale(this->trans, glm::vec3(scale, scale, 0.0));
+		glUniformMatrix4fv(glGetUniformLocation(this->program->id, "trans"), 1, GL_FALSE, glm::value_ptr(glm::scale(this->trans, glm::vec3(scale, scale, 0.0))));
 
 		glBindVertexArray(this->vao);
 		glBindTexture(GL_TEXTURE_2D, this->texture);
