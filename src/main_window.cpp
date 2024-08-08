@@ -14,8 +14,10 @@
 
 #include <stb_image.h>
 
-#include "awesome_rectangle.h"
-#include "texured_rectangle.h"
+#include "graphics/examples/texured_rectangle.h"
+#include "graphics/examples/awesome_rectangle.h"
+#include "graphics/examples/awesome_cube.h"
+#include "graphics/examples/awesome_cube_field.h"
 
 
 MainWindow::MainWindow()
@@ -130,12 +132,30 @@ void MainWindow::ProcessInput()
 		glfwSetWindowShouldClose(window, true);
 	}
 
+	// X-axis
+	if (glfwGetKey(this->window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		this->settings_menu->shift_x += 0.01f;
+	}
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		this->settings_menu->shift_x -= 0.01f;
+	}
+
+	// Y-axis
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		this->settings_menu->shift_y += 0.01f;
+	}
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+		this->settings_menu->shift_y -= 0.01f;
+	}
+
+	// Z-axis
 	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
-		this->mix_value += 0.01;
+		this->settings_menu->shift_z -= 0.01f;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		this->mix_value -= 0.01;
+		this->settings_menu->shift_z += 0.01f;
 	}
+
 	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
 }
 
@@ -193,6 +213,14 @@ void MainWindow::RenderOpenGL()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+	if (this->settings_menu->enable_depth_testing) {
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	else {
+		glDisable(GL_DEPTH_TEST);
+	}
+
 	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)
 	{
 		RenderTarget* current_target = this->render_targets[i];
@@ -203,7 +231,9 @@ void MainWindow::RenderOpenGL()
 			case TEXTURED_RECTANGLE:
 				{
 					TexturedRectangle* tex_rect = (TexturedRectangle*)current_target;
-					tex_rect->horizontal_offset = this->settings_menu->horizontal_offset;
+					tex_rect->shift_x = this->settings_menu->shift_x;
+					tex_rect->shift_y = this->settings_menu->shift_y;
+					tex_rect->shift_z = this->settings_menu->shift_z;
 					break;
 				}
 			case AWESOME_RECTANGLE:
@@ -223,6 +253,10 @@ void MainWindow::RenderOpenGL()
 
 void MainWindow::SetupOpenGL()
 {
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
 	this->render_targets[TEXTURED_RECTANGLE] = (RenderTarget*) new TexturedRectangle();
 	this->render_targets[AWESOME_RECTANGLE] = (RenderTarget*) new AwesomeRectangle();
+	this->render_targets[AWESOME_CUBE] = (RenderTarget*) new AwesomeCube(&io.Framerate);
+	this->render_targets[AWESOME_CUBE_FIELD] = (RenderTarget*) new AwesomeCubeField(&io.Framerate);
 }

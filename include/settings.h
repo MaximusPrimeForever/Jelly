@@ -1,5 +1,7 @@
 #pragma once
 
+#define ASPECT_RATIO (16.0f/10.0f)
+
 #define WINDOW_WIDTH_REL_SCALE (0.8)
 #define WINDOW_HEIGHT_REL_SCALE (0.8)
 #define FONT_SIZE (18)

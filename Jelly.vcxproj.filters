@@ -248,6 +248,12 @@
     <ClInclude Include="include\graphics\awesome_gl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\examples\awesome_cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\examples\awesome_cube_field.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
@@ -261,6 +267,10 @@
     <None Include="shaders\awesome_rectangle\vertex_aws_rect.glsl" />
     <None Include="shaders\textured_rectangle\vertex_tex_rect.glsl" />
     <None Include="shaders\textured_rectangle\frag_tex_rect.glsl" />
+    <None Include="shaders\awesome_cube\frag_aws_cube.glsl" />
+    <None Include="shaders\awesome_cube\vertex_aws_cube.glsl" />
+    <None Include="shaders\awesome_cube_field\vertex_aws_field.glsl" />
+    <None Include="shaders\awesome_cube_field\frag_aws_field.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\JetBrainsMono-Regular.ttf">

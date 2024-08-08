@@ -184,6 +184,8 @@
     <ClInclude Include="libs\imgui\include\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\include\imstb_truetype.h" />
     <ClInclude Include="src\defs.h" />
+    <ClInclude Include="src\graphics\examples\awesome_cube.h" />
+    <ClInclude Include="src\graphics\examples\awesome_cube_field.h" />
     <ClInclude Include="src\graphics\examples\awesome_rectangle.h" />
     <ClInclude Include="src\graphics\examples\texured_rectangle.h" />
     <ClInclude Include="src\imfilebrowser.h" />
@@ -193,6 +195,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
+    <None Include="shaders\awesome_cube\frag_aws_cube.glsl" />
+    <None Include="shaders\awesome_cube\vertex_aws_cube.glsl" />
+    <None Include="shaders\awesome_cube_field\frag_aws_field.glsl" />
+    <None Include="shaders\awesome_cube_field\vertex_aws_field.glsl" />
     <None Include="shaders\awesome_rectangle\frag_aws_rect.glsl" />
     <None Include="shaders\awesome_rectangle\vertex_aws_rect.glsl" />
     <None Include="shaders\frag.glsl" />

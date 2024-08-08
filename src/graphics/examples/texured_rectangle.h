@@ -8,6 +8,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+
+#include "graphics/awesome_gl.h"
 
 
 class TexturedRectangle : RenderTarget
@@ -16,9 +19,13 @@ private:
 	GLuint vao;
 	GLuint texture;
 	ShaderProgram* program;
-	glm::mat4 trans;
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
 public:
-	float horizontal_offset;
+	float shift_x;
+	float shift_y;
+	float shift_z;
 
 	TexturedRectangle()
 	{
@@ -39,7 +46,9 @@ public:
 			Shader{".\\shaders\\textured_rectangle\\frag_tex_rect.glsl", GL_FRAGMENT_SHADER, 0},
 		};
 		this->program = new ShaderProgram(shader_paths, sizeof(shader_paths) / sizeof(Shader));
-		this->horizontal_offset = 0.0;
+		this->shift_x = 0.0f;
+		this->shift_y = 0.0f;
+		this->shift_z = 0.0f;
 
 		GLuint vbo, ebo;
 		glGenVertexArrays(1, &this->vao);
@@ -85,21 +94,40 @@ public:
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
 
-		this->trans = glm::mat4(1.0f);
-		this->trans = glm::translate(this->trans, glm::vec3(-0.5, 0.5, 0));
+		this->model = glm::mat4(1.0f);
+		this->view = glm::mat4(1.0f);
+
+		this->model = glm::rotate(
+			this->model, 
+			glm::radians(-55.0f), 
+			glm::vec3(1.0, 0.0, 0.0)
+		);
+		this->view = glm::translate(this->view, glm::vec3(0.0f, 0.0f, -3.0f));
+		this->projection = glm::perspective(
+			glm::radians(45.0f), 
+			ASPECT_RATIO, 
+			0.1f,
+			100.0f
+		);
 	}
+
 	void Render() override
 	{
 		this->program->Use();
 
-		float scale = glm::abs(glm::sin((float)glfwGetTime()));
-		//this->trans = glm::scale(this->trans, glm::vec3(scale, scale, 0.0));
-		glUniformMatrix4fv(glGetUniformLocation(this->program->id, "trans"), 1, GL_FALSE, glm::value_ptr(glm::scale(this->trans, glm::vec3(scale, scale, 0.0))));
+		glm::vec3 shift_vector = glm::rotate(
+			glm::vec3(this->shift_x, this->shift_y, this->shift_z), 
+			glm::radians(55.0f), 
+			glm::vec3(1.0, 0.0, 0.0)
+		);
+		glm::mat4 move = glm::translate(this->model, shift_vector);
+
+		this->program->SetMat4("model", move);
+		this->program->SetMat4("view", this->view);
+		this->program->SetMat4("projection", this->projection);
 
 		glBindVertexArray(this->vao);
 		glBindTexture(GL_TEXTURE_2D, this->texture);
-
-		this->program->SetFloat("horizontal_offset", this->horizontal_offset);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
