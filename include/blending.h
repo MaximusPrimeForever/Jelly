@@ -24,15 +24,6 @@ typedef enum e_BlendingMode
     BLENDING_MODE_COUNT
 } BlendingMode;
 
-bool BlendRawImages(
-    IN Image* bg_image,
-    IN Image* fg_image,
-    IN uint32_t fg_pos_x,
-    IN uint32_t fg_pos_y,
-    IN BlendingMode mode,
-    OUT Image* final_image
-);
-
 bool LoadTextureFromStbBuffer(
     IN unsigned char* image_data,
     IN int img_width,

@@ -80,8 +80,8 @@ void MainWindow::InitializeGlfw()
 	}
 
 	this->window = glfwCreateWindow(
-		this->monitorDimensions.width * WINDOW_WIDTH_REL_SCALE,
-		this->monitorDimensions.height * WINDOW_HEIGHT_REL_SCALE,
+		static_cast<int>(static_cast<float>(this->monitorDimensions.width) * WINDOW_WIDTH_REL_SCALE),
+		static_cast<int>(static_cast<float>(this->monitorDimensions.height) * WINDOW_HEIGHT_REL_SCALE),
 		APP_NAME,
 		nullptr,
 		nullptr
@@ -230,7 +230,7 @@ void MainWindow::RenderOpenGL()
 			{
 			case TEXTURED_RECTANGLE:
 				{
-					TexturedRectangle* tex_rect = (TexturedRectangle*)current_target;
+					TexturedRectangle* tex_rect = reinterpret_cast<TexturedRectangle*>(current_target);
 					tex_rect->shift_x = this->settings_menu->shift_x;
 					tex_rect->shift_y = this->settings_menu->shift_y;
 					tex_rect->shift_z = this->settings_menu->shift_z;
@@ -238,7 +238,7 @@ void MainWindow::RenderOpenGL()
 				}
 			case AWESOME_RECTANGLE:
 			{
-				AwesomeRectangle* tex_rect = (AwesomeRectangle*)current_target;
+				AwesomeRectangle* tex_rect = reinterpret_cast<AwesomeRectangle*>(current_target);
 				tex_rect->mix_value = this->mix_value;
 				break;
 			}
@@ -255,8 +255,8 @@ void MainWindow::SetupOpenGL()
 {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	this->render_targets[TEXTURED_RECTANGLE] = (RenderTarget*) new TexturedRectangle();
-	this->render_targets[AWESOME_RECTANGLE] = (RenderTarget*) new AwesomeRectangle();
-	this->render_targets[AWESOME_CUBE] = (RenderTarget*) new AwesomeCube(&io.Framerate);
-	this->render_targets[AWESOME_CUBE_FIELD] = (RenderTarget*) new AwesomeCubeField(&io.Framerate);
+	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle());
+	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle());
+	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(&io.Framerate));
+	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(&io.Framerate));
 }

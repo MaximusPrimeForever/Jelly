@@ -128,7 +128,10 @@ void ImageCompositor::Show()
         blended_image.width, blended_image.height,
         GL_RGBA, GL_UNSIGNED_BYTE, blended_image.image_data
     );
-    ImGui::Image((void*)(intptr_t)blended_texture, ImVec2(blended_image.width, blended_image.height));
+    ImGui::Image(
+        (void*)(intptr_t)blended_texture, 
+        ImVec2(static_cast<float>(blended_image.width), static_cast<float>(blended_image.height))
+    );
     ImGui::End();
     ImGui::PopFont();
 }

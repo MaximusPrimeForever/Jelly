@@ -173,16 +173,6 @@ public:
 			glm::vec3(-1.3f,  1.0f, -1.5f)
 		};
 
-		//this->model = glm::rotate(
-		//	this->model,
-		//	(float) (glm::radians(50.0f * frame_time)),
-		//	glm::vec3(0.5f, 1.0f, 0.0f)
-		//);
-
-		//this->program->SetMat4("model", this->model);
-		this->program->SetMat4("view", this->view);
-		this->program->SetMat4("projection", this->projection);
-
 		glBindVertexArray(this->vao);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -191,12 +181,18 @@ public:
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
 
+
+		this->program->SetMat4("view", this->view);
+		this->program->SetMat4("projection", this->projection);
+
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			this->model = glm::mat4(1.0f);
 			this->model = glm::translate(this->model, cube_positions[i]);
-			float angle = 20.0f * (i + 1);
+
+			float angle = 20.0f * (static_cast<float>(i) + 1.0f) * static_cast<float>(glfwGetTime());
 			this->model = glm::rotate(this->model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
 			this->program->SetMat4("model", this->model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
