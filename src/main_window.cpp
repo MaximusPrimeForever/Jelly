@@ -19,6 +19,8 @@
 #include "graphics/examples/awesome_cube.h"
 #include "graphics/examples/awesome_cube_field.h"
 
+#include "graphics/camera.h"
+
 
 MainWindow::MainWindow()
 {
@@ -33,11 +35,18 @@ MainWindow::MainWindow()
 	ImGui_ImplGlfw_InitForOpenGL(this->window, true);
 	ImGui_ImplOpenGL3_Init(this->glsl_version);
 
+	this->camera = new Camera(
+		glm::vec3(0.0f, 0.0f, 3.0f), 
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		DEFAULT_VERTICAL_FOV
+	);
+
 	this->SetupOpenGL();
 
 	// Setup ImGui widgets
 	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
 	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
+	this->settings_menu->show_awesome_cube_field = true;
 
 	this->background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
@@ -132,29 +141,43 @@ void MainWindow::ProcessInput()
 		glfwSetWindowShouldClose(window, true);
 	}
 
+	float camera_speed = 0.05f;
+	glm::vec3 camera_pos_delta = glm::vec3();
+	glm::vec3 camera_front = glm::vec3(0.0f, 0.0f, -1.0f);
+
 	// X-axis
 	if (glfwGetKey(this->window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		this->settings_menu->shift_x += 0.01f;
+		camera_pos_delta += this->camera->right * camera_speed;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		this->settings_menu->shift_x -= 0.01f;
+		camera_pos_delta += this->camera->right * -camera_speed;
 	}
 
 	// Y-axis
 	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		this->settings_menu->shift_y += 0.01f;
+		camera_pos_delta += this->camera->up * camera_speed;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 		this->settings_menu->shift_y -= 0.01f;
+		camera_pos_delta += this->camera->up * -camera_speed;
 	}
 
 	// Z-axis
 	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
 		this->settings_menu->shift_z -= 0.01f;
+		camera_pos_delta += camera_front * camera_speed;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		this->settings_menu->shift_z += 0.01f;
+		camera_pos_delta += camera_front * -camera_speed;
 	}
+
+	// Set camera to point straight
+	this->camera->AddPositionDelta(camera_pos_delta, false);
+	this->camera->SetTarget(this->camera->position + camera_front);
 
 	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
 }
@@ -221,6 +244,18 @@ void MainWindow::RenderOpenGL()
 		glDisable(GL_DEPTH_TEST);
 	}
 
+	// Computationally heavy tasks should be done only if UI has been updated
+	// To avoid running them every frame when values haven't changed
+	if (this->settings_menu->has_ui_updated)
+	{
+		/*
+		 * Note: interestingly, ProcessInput() modified values in the settings menu
+		 * which get reflected in ImGui, the sliders move, but doesn't trigger this condition.
+		 * ImGui methods must return `true` only if the user interacted with the widget directly
+		 */
+		this->camera->SetVFov(this->settings_menu->vfov);
+	}
+
 	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)
 	{
 		RenderTarget* current_target = this->render_targets[i];
@@ -234,19 +269,26 @@ void MainWindow::RenderOpenGL()
 					tex_rect->shift_x = this->settings_menu->shift_x;
 					tex_rect->shift_y = this->settings_menu->shift_y;
 					tex_rect->shift_z = this->settings_menu->shift_z;
+					if (this->settings_menu->show_textured_rect) current_target->Render();
 					break;
 				}
 			case AWESOME_RECTANGLE:
 			{
 				AwesomeRectangle* tex_rect = reinterpret_cast<AwesomeRectangle*>(current_target);
 				tex_rect->mix_value = this->mix_value;
+				if (this->settings_menu->show_awesome_rect) current_target->Render();
 				break;
 			}
+			case AWESOME_CUBE:
+				if (this->settings_menu->show_awesome_cube) current_target->Render();
+				break;
+			case AWESOME_CUBE_FIELD:
+				if (this->settings_menu->show_awesome_cube_field) current_target->Render();
+				break;
 			default:
+				current_target->Render();
 				break;
 			}
-
-			current_target->Render();
 		}
 	}
 }
@@ -255,8 +297,8 @@ void MainWindow::SetupOpenGL()
 {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle());
-	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle());
-	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(&io.Framerate));
-	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(&io.Framerate));
+	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
+	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
+	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
+	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera,&io.Framerate));
 }

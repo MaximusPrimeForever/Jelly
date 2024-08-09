@@ -1,13 +1,12 @@
 #pragma once
 
 #include <graphics/shaders.h>
+#include <graphics/camera.h>
 #include <graphics/render_target.h>
 
 #include <stb_image.h>
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "graphics/awesome_gl.h"
@@ -27,7 +26,7 @@ public:
 	float shift_y;
 	float shift_z;
 
-	TexturedRectangle()
+	TexturedRectangle(Camera* cam): RenderTarget(cam)
 	{
 		float vertices[] = {
 		// positions          // colors           // texture coords

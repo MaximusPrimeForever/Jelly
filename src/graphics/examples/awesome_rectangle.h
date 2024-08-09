@@ -4,6 +4,7 @@
 #include <graphics/render_target.h>
 
 #include <stb_image.h>
+#include "graphics/camera.h"
 #include "graphics/awesome_gl.h"
 
 #include <glm/glm.hpp>
@@ -21,7 +22,7 @@ private:
 public:
 	float mix_value;
 
-	AwesomeRectangle()
+	AwesomeRectangle(Camera* cam) : RenderTarget(cam)
 	{
 		float vertices[] = {
 		// positions          // colors           // texture coords

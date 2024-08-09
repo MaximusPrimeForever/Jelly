@@ -135,6 +135,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\blending.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\graphics\camera.cpp" />
     <ClCompile Include="src\graphics\shaders.cpp" />
     <ClCompile Include="src\main_window.cpp" />
     <ClCompile Include="src\Widgets\image_compositor.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="backends\imgui_impl_win32.h" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\graphics\awesome_gl.h" />
+    <ClInclude Include="include\graphics\camera.h" />
     <ClInclude Include="include\graphics\render_target.h" />
     <ClInclude Include="include\graphics\shaders.h" />
     <ClInclude Include="include\io\file_io.h" />

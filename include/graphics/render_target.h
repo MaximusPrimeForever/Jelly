@@ -1,9 +1,13 @@
 #pragma once
 
+#include "camera.h"
+
 class RenderTarget
 {
+protected:
+	Camera* cam;
 public:
-	virtual void Render();
+	RenderTarget(Camera* cam) : cam(cam) {};
+	virtual void Render() {};
+	virtual ~RenderTarget() = default;
 };
-
-inline void RenderTarget::Render() {};

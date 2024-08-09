@@ -4,11 +4,11 @@
 #include <graphics/render_target.h>
 
 #include <stb_image.h>
-#include "graphics/awesome_gl.h"
+#include <graphics/camera.h>
+#include <graphics/awesome_gl.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "settings.h"
 
@@ -28,7 +28,7 @@ private:
 public:
 	float mix_value;
 
-	AwesomeCube(float* fps)
+	AwesomeCube(Camera* cam, float* fps): RenderTarget(cam)
 	{
 		this->mix_value = 0.5;
 		this->fps = fps;

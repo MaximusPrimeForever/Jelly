@@ -4,11 +4,11 @@
 #include <graphics/render_target.h>
 
 #include <stb_image.h>
-#include "graphics/awesome_gl.h"
+#include <graphics/camera.h>
+#include <graphics/awesome_gl.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "settings.h"
 
@@ -22,13 +22,11 @@ private:
 	ShaderProgram* program = NULL;
 
 	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 projection;
 
 public:
 	float mix_value;
 
-	AwesomeCubeField(float* fps) : fps(fps), mix_value(0.2f)
+	AwesomeCubeField(Camera* cam, float* fps) : RenderTarget(cam), fps(fps), mix_value(0.2f)
 	{
 		GLuint vbo, vbo_face;
 		int width, height, nrChannels;
@@ -142,17 +140,7 @@ public:
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
 		this->program->SetInt("tex1_data", AGL_SAMPLER_TEXTURE1);
 
-
 		this->model = glm::mat4(1.0f);
-		this->view = glm::mat4(1.0f);
-
-		this->view = glm::translate(this->view, glm::vec3(0.0f, 0.0f, -3.0f));
-		this->projection = glm::perspective(
-			glm::radians(45.0f),
-			ASPECT_RATIO,
-			0.1f,
-			100.0f
-		);
 	}
 
 	void Render() override
@@ -181,9 +169,8 @@ public:
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
 
-
-		this->program->SetMat4("view", this->view);
-		this->program->SetMat4("projection", this->projection);
+		this->program->SetMat4("view", this->cam->look_at);
+		this->program->SetMat4("projection", this->cam->projection);
 
 		for (unsigned int i = 0; i < 10; i++)
 		{

@@ -3,8 +3,8 @@
 #include "imgui.h"
 #include "superglue.h"
 
-#include "graphics/shaders.h"
 #include "graphics/render_target.h"
+#include "graphics/camera.h"
 
 #include "widgets/image_compositor.h"
 #include "widgets/settings_menu.h"
@@ -45,6 +45,7 @@ private:
 	ImFont* font;
 
 	// OpenGL
+	Camera* camera;
 	RenderTarget* render_targets[RENDER_TARGET_COUNT] = { 0 };
 	float mix_value = 0.5;
 
