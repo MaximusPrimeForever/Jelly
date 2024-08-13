@@ -260,6 +260,9 @@
     <ClInclude Include="src\graphics\examples\let_there_be_light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\examples\xz_grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
@@ -280,6 +283,8 @@
     <None Include="shaders\let_there_be_light\vertex_objects.glsl" />
     <None Include="shaders\let_there_be_light\frag_objects.glsl" />
     <None Include="shaders\let_there_be_light\frag_light.glsl" />
+    <None Include="shaders\xz_grid\frag_xz_grid.glsl" />
+    <None Include="shaders\xz_grid\vertex_xz_grid.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\JetBrainsMono-Regular.ttf">

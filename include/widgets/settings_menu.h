@@ -17,6 +17,7 @@ public:
 	float color_buffer[4] = { 1.0, 1.0, 1.0, 1.0 };
 	glm::vec4 color_vector;
 
+	bool show_grid;
 	bool show_textured_rect;
     bool show_awesome_rect;
     bool show_awesome_cube;
@@ -36,6 +37,7 @@ public:
 		this->enable_depth_testing = false;
 		this->vfov = CAMERA_DEFAULT_VERTICAL_FOV;
 
+		this->show_grid = false;
 		this->show_textured_rect = false;
 		this->show_awesome_rect = false;
 		this->show_awesome_cube = false;
@@ -56,12 +58,11 @@ public:
 		ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::Text("Press HOME to release mouse");
-		ImGui::Spacing();
 
 		ImGui::SeparatorText("OpenGL settings");
 		this->has_ui_updated |= ImGui::Checkbox("Enable Wireframe", &this->enable_wireframe);
 		this->has_ui_updated |= ImGui::Checkbox("Enable depth testing", &this->enable_depth_testing);
-		ImGui::Spacing();
+		this->has_ui_updated |= ImGui::Checkbox("Show grid", &this->show_grid);
 
 		ImGui::SeparatorText("Camera settings");
 		this->has_ui_updated |= ImGui::SliderFloat(
@@ -70,7 +71,6 @@ public:
 			CAMERA_MIN_VERTICAL_FOV,
 			CAMERA_MAX_VERTICAL_FOV
 		);
-		ImGui::Spacing();
 
 		ImGui::SeparatorText("Input settings");
 		this->has_ui_updated |= ImGui::SliderFloat(
@@ -79,11 +79,10 @@ public:
 			MOUSE_MIN_SENSITIVITY,
 			MOUSE_MAX_SENSITIVITY
 		);
-		ImGui::SeparatorText("Generic XYZ sliders");
+		ImGui::SeparatorText("XYZ sliders");
 		this->has_ui_updated |= ImGui::SliderFloat("X-Axis", &this->shift_x, 0.0f, 1.0f);
 		this->has_ui_updated |= ImGui::SliderFloat("Y-Axis", &this->shift_y, 0.0f, 1.0f);
 		this->has_ui_updated |= ImGui::SliderFloat("Z-Axis", &this->shift_z, 0.0f, 1.0f);
-		ImGui::Spacing();
 
 		ImGui::SeparatorText("Color Picker");
 		ImGuiColorEditFlags flags;

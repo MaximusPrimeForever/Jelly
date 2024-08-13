@@ -16,6 +16,7 @@
 #include <stb_image.h>
 
 // Render targets
+#include "xz_grid.h"
 #include "graphics/examples/texured_rectangle.h"
 #include "graphics/examples/awesome_rectangle.h"
 #include "graphics/examples/awesome_cube.h"
@@ -60,12 +61,15 @@ void MainWindow::InitializeSettings()
 	// Setup ImGui widgets
 	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
 	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
+
+	// Setup default settings
 	this->settings_menu->enable_depth_testing = true;
 	this->settings_menu->show_let_there_be_light = true;
+	this->settings_menu->show_grid = true;
 
 	// Set camera settings
 	this->camera = new Camera(
-		glm::vec3(0.0f, 0.0f, 3.0f),
+		glm::vec3(1.0f, 1.0f, 3.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		CAMERA_DEFAULT_YAW,
 		CAMERA_DEFAULT_PITCH
@@ -297,12 +301,15 @@ void MainWindow::ProcessInput()
 void MainWindow::SetupOpenGL()
 {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
 	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
 	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
 	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate));
 	this->render_targets[LET_THERE_BE_LIGHT] = reinterpret_cast<RenderTarget*>(new LetThereBeLight(this->camera, &io.Framerate));
+	this->render_targets[XZ_GRID] = reinterpret_cast<RenderTarget*>(new XzGrid(this->camera));
 }
 
 void MainWindow::RenderOpenGL() const
@@ -324,7 +331,7 @@ void MainWindow::RenderOpenGL() const
 	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)
 	{
 		RenderTarget* current_target = this->render_targets[i];
-		if (current_target != NULL)
+		if (current_target != nullptr)
 		{
 			switch (i)
 			{
@@ -364,6 +371,11 @@ void MainWindow::RenderOpenGL() const
 				);
 				light_scene->light_color = this->settings_menu->color_vector;
 				if (this->settings_menu->show_let_there_be_light) current_target->Render();
+				break;
+			}
+			case XZ_GRID:
+			{
+				if (this->settings_menu->show_grid) current_target->Render();
 				break;
 			}
 			default:
