@@ -63,9 +63,9 @@ void Camera::ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool 
 	this->UpdateCameraVectors();
 }
 
-void Camera::SetVerticalFovDelta(float delta_fov)
+void Camera::SetVerticalFov(float new_vfov)
 {
-	this->vfov = std::clamp(this->vfov - delta_fov, CAMERA_MIN_VERTICAL_FOV, CAMERA_MAX_VERTICAL_FOV);
+	this->vfov = std::clamp(new_vfov, CAMERA_MIN_VERTICAL_FOV, CAMERA_MAX_VERTICAL_FOV);
 }
 
 // returns the view matrix calculated using Euler Angles and the LookAt Matrix

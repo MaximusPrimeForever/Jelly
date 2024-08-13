@@ -41,5 +41,5 @@ public:
 
 	void ProcessAxisLockedMovement(CAMERA_DIRECTION direction, float delta_time);
 	void ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool constrain_pitch = true);
-	void SetVerticalFovDelta(float delta_fov);
+	void SetVerticalFov(float new_vfov);
 };

@@ -144,7 +144,6 @@
     <ClCompile Include="src\graphics\shaders.cpp" />
     <ClCompile Include="src\main_window.cpp" />
     <ClCompile Include="src\Widgets\image_compositor.cpp" />
-    <ClCompile Include="src\Widgets\settings_menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_allegro5.h" />

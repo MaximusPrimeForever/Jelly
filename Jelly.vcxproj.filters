@@ -96,9 +96,6 @@
     <ClCompile Include="src\io\file_io.cpp">
       <Filter>Source Files\io</Filter>
     </ClCompile>
-    <ClCompile Include="src\Widgets\settings_menu.cpp">
-      <Filter>Source Files\widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\shaders.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>

@@ -40,11 +40,6 @@ MainWindow::MainWindow()
 
 	this->SetupOpenGL();
 
-	// Setup ImGui widgets
-	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
-	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
-	this->settings_menu->show_awesome_cube_field = true;
-
 	this->background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
@@ -60,6 +55,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::InitializeSettings()
 {
+	// Setup ImGui widgets
+	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
+	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
+	this->settings_menu->show_awesome_cube_field = true;
+
 	// Set camera settings
 	this->camera = new Camera(
 		glm::vec3(0.0f, 0.0f, 3.0f),
@@ -67,7 +67,7 @@ void MainWindow::InitializeSettings()
 		CAMERA_DEFAULT_YAW,
 		CAMERA_DEFAULT_PITCH
 	);
-	this->camera->look_sensitivity = MOUSE_DEFAULT_SENSITIVITY;
+	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
 
 	// Set mouse settings
 	this->disable_cursor = false;
@@ -165,7 +165,9 @@ void MainWindow::UpdateCameraFromMouse()
 	this->mouse.last_y = static_cast<float>(y_pos);
 
 	// When cursor is enabled, ignore orientation changes but react to scrolling
-	this->camera->SetVerticalFovDelta(g_mouse.scroll_y_offset);
+	// FOV is controlled from the settings menu, so updated that instead of the camera directly
+	this->settings_menu->vfov -= g_mouse.scroll_y_offset;
+	g_mouse.scroll_y_offset = 0.0f;
 
 	if (!this->disable_cursor) return;
 	this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
@@ -178,11 +180,11 @@ void MainWindow::UpdateCameraFromKeyboard() const
 	float frame_time = 1000.0f / io.Framerate;
 
 	// X-axis
-	if (glfwGetKey(this->window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS) {
 		this->settings_menu->shift_x += 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::RIGHT, frame_time);
 	}
-	if (glfwGetKey(this->window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS) {
 		this->settings_menu->shift_x -= 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::LEFT, frame_time);
 	}
@@ -198,11 +200,11 @@ void MainWindow::UpdateCameraFromKeyboard() const
 	}
 
 	// Z-axis
-	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
+	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS) {
 		this->settings_menu->shift_z -= 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::FORWARD, frame_time);
 	}
-	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS) {
 		this->settings_menu->shift_z += 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::BACKWARD, frame_time);
 	}
@@ -295,7 +297,8 @@ void MainWindow::ShowImGui()
 		this->im_comp->Show();
 	}
 
-	this->camera->vfov = this->settings_menu->vfov;
+	this->camera->SetVerticalFov(this->settings_menu->vfov);
+	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
 }
 
 void MainWindow::RenderOpenGL()
