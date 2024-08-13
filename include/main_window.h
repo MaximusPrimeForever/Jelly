@@ -15,6 +15,7 @@ typedef enum RENDER_TARGET_ENUM_T
 	AWESOME_RECTANGLE,
 	AWESOME_CUBE,
 	AWESOME_CUBE_FIELD,
+	LET_THERE_BE_LIGHT,
 
 	// Auto count
 	RENDER_TARGET_COUNT
@@ -63,8 +64,8 @@ private:
 	
 	bool GetMonitorDimensions();
 	void ProcessInput();
-	void ShowImGui();
-	void RenderOpenGL();
+	void ShowImGui() const;
+	void RenderOpenGL() const;
 	void SetupOpenGL();
 
 public:

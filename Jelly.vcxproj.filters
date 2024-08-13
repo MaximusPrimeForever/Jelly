@@ -257,6 +257,9 @@
     <ClInclude Include="include\graphics\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\examples\let_there_be_light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
@@ -274,10 +277,16 @@
     <None Include="shaders\awesome_cube\vertex_aws_cube.glsl" />
     <None Include="shaders\awesome_cube_field\vertex_aws_field.glsl" />
     <None Include="shaders\awesome_cube_field\frag_aws_field.glsl" />
+    <None Include="shaders\let_there_be_light\vertex_objects.glsl" />
+    <None Include="shaders\let_there_be_light\frag_objects.glsl" />
+    <None Include="shaders\let_there_be_light\frag_light.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\JetBrainsMono-Regular.ttf">
       <Filter>Resource Files</Filter>
     </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\let_there_be_light\vertex_light.glsl" />
   </ItemGroup>
 </Project>

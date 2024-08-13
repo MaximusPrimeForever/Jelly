@@ -15,10 +15,12 @@
 #include <functional>
 #include <stb_image.h>
 
+// Render targets
 #include "graphics/examples/texured_rectangle.h"
 #include "graphics/examples/awesome_rectangle.h"
 #include "graphics/examples/awesome_cube.h"
 #include "graphics/examples/awesome_cube_field.h"
+#include "graphics/examples/let_there_be_light.h"
 
 #include "graphics/camera.h"
 
@@ -58,7 +60,8 @@ void MainWindow::InitializeSettings()
 	// Setup ImGui widgets
 	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
 	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
-	this->settings_menu->show_awesome_cube_field = true;
+	this->settings_menu->enable_depth_testing = true;
+	this->settings_menu->show_let_there_be_light = true;
 
 	// Set camera settings
 	this->camera = new Camera(
@@ -126,14 +129,36 @@ void MainWindow::InitializeGlfw()
 	glfwSetScrollCallback(window, MouseScrollCallback);
 }
 
-void MainWindow::SetupOpenGL()
+bool MainWindow::ShouldClose()
 {
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	return glfwWindowShouldClose(this->window);
+}
 
-	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
-	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
-	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
-	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate));
+void MainWindow::Show()
+{
+	// React to user input
+	glfwPollEvents();
+	this->ProcessInput();
+
+	// Clear previous frame
+	int display_w, display_h;
+	glfwGetFramebufferSize(window, &display_w, &display_h);
+	glViewport(0, 0, display_w, display_h);
+	glClearColor(background_color.x * background_color.w, background_color.y * background_color.w, background_color.z * background_color.w, background_color.w);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Ready ImGui windows for rendering
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	this->ShowImGui();
+	ImGui::Render();
+
+	// Render
+	this->RenderOpenGL();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	glfwSwapBuffers(window);
 }
 
 void MainWindow::InitializeImGui()
@@ -151,6 +176,23 @@ void MainWindow::InitializeImGui()
 	// TODO: check font path before loading.
 	this->font = io.Fonts->AddFontFromFileTTF(".\\fonts\\JetBrainsMono-Regular.ttf", FONT_SIZE * this->monitorDimensions.height_dpi_scale);
 	ImGui::GetStyle().ScaleAllSizes(this->monitorDimensions.height_dpi_scale);
+}
+
+void MainWindow::ShowImGui() const
+{
+	this->settings_menu->Show();
+
+	// Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	ImGui::ShowDemoWindow();
+
+	// Show image compositor
+	if (this->settings_menu->show_image_compositor)
+	{
+		this->im_comp->Show();
+	}
+
+	this->camera->SetVerticalFov(this->settings_menu->vfov);
+	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
 }
 
 void MainWindow::UpdateCameraFromMouse()
@@ -252,56 +294,18 @@ void MainWindow::ProcessInput()
 	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
 }
 
-bool MainWindow::ShouldClose()
+void MainWindow::SetupOpenGL()
 {
-	return glfwWindowShouldClose(this->window);
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
+	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
+	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
+	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate));
+	this->render_targets[LET_THERE_BE_LIGHT] = reinterpret_cast<RenderTarget*>(new LetThereBeLight(this->camera, &io.Framerate));
 }
 
-void MainWindow::Show()
-{
-	// React to user input
-    glfwPollEvents();
-    this->ProcessInput();
-
-	// Clear previous frame
-	int display_w, display_h;
-	glfwGetFramebufferSize(window, &display_w, &display_h);
-	glViewport(0, 0, display_w, display_h);
-    glClearColor(background_color.x * background_color.w, background_color.y * background_color.w, background_color.z * background_color.w, background_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-	// Ready ImGui windows for rendering
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-	this->ShowImGui();
-    ImGui::Render();
-
-	// Render
-	this->RenderOpenGL();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    glfwSwapBuffers(window);
-}
-
-void MainWindow::ShowImGui()
-{
-	this->settings_menu->Show();
-
-	// Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-	ImGui::ShowDemoWindow();
-
-	// Show image compositor
-	if (this->settings_menu->show_image_compositor)
-	{
-		this->im_comp->Show();
-	}
-
-	this->camera->SetVerticalFov(this->settings_menu->vfov);
-	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
-}
-
-void MainWindow::RenderOpenGL()
+void MainWindow::RenderOpenGL() const
 {
 	if (this->settings_menu->enable_wireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -325,14 +329,14 @@ void MainWindow::RenderOpenGL()
 			switch (i)
 			{
 			case TEXTURED_RECTANGLE:
-				{
-					TexturedRectangle* tex_rect = reinterpret_cast<TexturedRectangle*>(current_target);
-					tex_rect->shift_x = this->settings_menu->shift_x;
-					tex_rect->shift_y = this->settings_menu->shift_y;
-					tex_rect->shift_z = this->settings_menu->shift_z;
-					if (this->settings_menu->show_textured_rect) current_target->Render();
-					break;
-				}
+			{
+				TexturedRectangle* tex_rect = reinterpret_cast<TexturedRectangle*>(current_target);
+				tex_rect->shift_x = this->settings_menu->shift_x;
+				tex_rect->shift_y = this->settings_menu->shift_y;
+				tex_rect->shift_z = this->settings_menu->shift_z;
+				if (this->settings_menu->show_textured_rect) current_target->Render();
+				break;
+			}
 			case AWESOME_RECTANGLE:
 			{
 				AwesomeRectangle* tex_rect = reinterpret_cast<AwesomeRectangle*>(current_target);
@@ -341,11 +345,27 @@ void MainWindow::RenderOpenGL()
 				break;
 			}
 			case AWESOME_CUBE:
+			{
 				if (this->settings_menu->show_awesome_cube) current_target->Render();
 				break;
+			}
 			case AWESOME_CUBE_FIELD:
+			{
 				if (this->settings_menu->show_awesome_cube_field) current_target->Render();
 				break;
+			}
+			case LET_THERE_BE_LIGHT:
+			{
+				LetThereBeLight* light_scene = reinterpret_cast<LetThereBeLight*>(current_target);
+				light_scene->light_shift = glm::vec3(
+					this->settings_menu->shift_x,
+					this->settings_menu->shift_y,
+					this->settings_menu->shift_z
+				);
+				light_scene->light_color = this->settings_menu->color_vector;
+				if (this->settings_menu->show_let_there_be_light) current_target->Render();
+				break;
+			}
 			default:
 				current_target->Render();
 				break;
