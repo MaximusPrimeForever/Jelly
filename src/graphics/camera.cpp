@@ -6,102 +6,95 @@
 #include "settings.h"
 
 
-Camera::Camera(glm::vec3 position, glm::vec3 target, float vfov, float velocity)
+Camera::Camera(glm::vec3 position, glm::vec3 world_up, float yaw, float pitch):
+	front(glm::vec3(0.0f, 0.0f, -1.0f)),
+	vfov(CAMERA_DEFAULT_VERTICAL_FOV),
+	velocity(CAMERA_DEFAULT_VELOCITY),
+	look_sensitivity(MOUSE_DEFAULT_SENSITIVITY)
 {
 	this->position = position;
-	this->target = target;
 	this->up = glm::vec3(0.0f, 1.0f, 0.0f);
-	this->vfov = glm::radians(vfov);
-	this->velocity = velocity;
+	this->world_up = world_up;
+	this->yaw = yaw;
+	this->pitch = pitch;
 
-	this->GenerateLookAtMat();
-	this->projection = glm::perspective(
-		this->vfov,
+	this->UpdateCameraVectors();
+}
+
+void Camera::ProcessAxisLockedMovement(CAMERA_DIRECTION direction, float delta_time)
+{
+	float new_velocity = (this->velocity * delta_time);
+	switch (direction)
+	{
+	case CAMERA_DIRECTION::FORWARD:
+		this->position += this->front * new_velocity;
+		break;
+	case CAMERA_DIRECTION::BACKWARD:
+		this->position -= this->front * new_velocity;
+		break;
+	case CAMERA_DIRECTION::RIGHT:
+		this->position += this->right * new_velocity;
+		break;
+	case CAMERA_DIRECTION::LEFT:
+		this->position -= this->right * new_velocity;
+		break;
+	case CAMERA_DIRECTION::UP:
+		this->position += this->world_up * new_velocity;
+		break;
+	case CAMERA_DIRECTION::DOWN:
+		this->position -= this->world_up * new_velocity;
+		break;
+	}
+}
+
+void Camera::ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool constrain_pitch)
+{
+	this->yaw += yaw_offset * this->look_sensitivity;
+	this->pitch += pitch_offset * this->look_sensitivity;
+
+	if (constrain_pitch) {
+		this->pitch = std::clamp(
+			this->pitch, 
+			CAMERA_BOTTOM_PITCH_LIMIT, 
+			CAMERA_TOP_PITCH_LIMIT
+		);
+	}
+
+	this->UpdateCameraVectors();
+}
+
+void Camera::SetVerticalFovDelta(float delta_fov)
+{
+	this->vfov = std::clamp(this->vfov - delta_fov, CAMERA_MIN_VERTICAL_FOV, CAMERA_MAX_VERTICAL_FOV);
+}
+
+// returns the view matrix calculated using Euler Angles and the LookAt Matrix
+glm::mat4 Camera::GetViewMatrix() const
+{
+	return glm::lookAt(this->position, this->position + this->front, this->up);
+}
+
+glm::mat4 Camera::GetProjectionMatrix() const
+{
+	return glm::perspective(
+		glm::radians(this->vfov),
 		ASPECT_RATIO,
-		0.1f,
-		100.0f
+		CAMERA_MIN_DRAW_DISTANCE,
+		CAMERA_MAX_DRAW_DISTANCE
 	);
 }
 
-glm::vec3 Camera::GenerateNormDirection() const
+void Camera::UpdateCameraVectors()
 {
-	return glm::normalize(glm::vec3(
+	// calculate the new Front vector
+	glm::vec3 new_front = glm::vec3(
 		glm::cos(glm::radians(this->yaw)) * glm::cos(glm::radians(this->pitch)),
 		glm::sin(glm::radians(this->pitch)),
 		glm::sin(glm::radians(this->yaw)) * glm::cos(glm::radians(this->pitch))
-	));
-}
-
-
-void Camera::GenerateLookAtMat()
-{
-	this->right = glm::normalize(glm::cross(this->up, this->position - this->target));
-	this->look_at = glm::lookAt(
-		this->position,
-		this->target,
-		this->up
 	);
-}
+	this->front = glm::normalize(new_front);
 
-void Camera::SetVFov(float new_vfov)
-{
-	this->vfov = glm::radians(new_vfov);
-	this->projection = glm::perspective(
-		this->vfov,
-		ASPECT_RATIO,
-		0.1f,
-		100.0f
-	);
-}
-
-void Camera::SetPitch(float new_pitch, bool use_as_delta, bool update_look_at)
-{
-	// Limit pitch to avoid weird camera movements
-	new_pitch = std::clamp(new_pitch, CAMERA_BOTTOM_PITCH_LIMIT, CAMERA_TOP_PITCH_LIMIT);
-	if (use_as_delta) this->pitch += new_pitch;
-	else this->pitch = new_pitch;
-
-	if (update_look_at) {
-		this->target = this->GenerateNormDirection();
-		this->GenerateLookAtMat();
-	}
-}
-
-void Camera::SetYaw(float new_yaw, bool use_as_delta, bool update_look_at)
-{
-	if (use_as_delta) this->yaw += new_yaw;
-	else this->yaw = new_yaw;
-
-	if (update_look_at) {
-		this->target = this->GenerateNormDirection();
-		this->GenerateLookAtMat();
-	}
-}
-
-void Camera::SetPosition(glm::vec3 new_position, bool use_as_delta, bool update_look_at)
-{
-	if (use_as_delta) this->position += new_position;
-	else this->position = new_position;
-
-	if (update_look_at) this->GenerateLookAtMat();
-}
-
-void Camera::SetTarget(glm::vec3 new_target, bool use_as_delta, bool update_look_at)
-{
-	if (use_as_delta) this->target += new_target;
-	else this->target = new_target;
-
-	if (update_look_at) this->GenerateLookAtMat();
-}
-
-void Camera::SetParameters(glm::vec3 new_position, glm::vec3 new_target)
-{
-	this->position = new_position;
-	this->target = new_target;
-	this->GenerateLookAtMat();
-}
-
-void Camera::SetTargetRelToPos(glm::vec3 new_target, bool update_look_at)
-{
-	this->SetTarget(this->position + new_target, update_look_at);
+	// also re-calculate the Right and Up vector
+	this->right = glm::normalize(glm::cross(this->front, this->world_up));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+	this->up = glm::normalize(glm::cross(this->right, this->front));
 }

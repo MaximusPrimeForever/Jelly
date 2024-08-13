@@ -33,9 +33,7 @@ typedef struct Mouse_t
 {
 	float last_x;
 	float last_y;
-	float delta_x;
-	float delta_y;
-	float sensitivity;
+	float scroll_y_offset;
 } Mouse;
 
 class MainWindow
@@ -74,10 +72,11 @@ public:
 	~MainWindow();
 
 	void UpdateCameraFromMouse();
+	void UpdateCameraFromKeyboard() const;
 	bool ShouldClose();
 	void Show();
 	void InitializeSettings();
 };
 
 inline Mouse g_mouse;
-void MouseCallback(GLFWwindow* window, double xpos, double ypos);
+void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);

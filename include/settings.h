@@ -11,11 +11,22 @@
 #define APP_NAME "Jelly"
 
 // Camera settings
+/// FOV
+#define CAMERA_MIN_VERTICAL_FOV (1.0f)
+#define CAMERA_MAX_VERTICAL_FOV (120.0f)
 #define CAMERA_DEFAULT_VERTICAL_FOV (45.0f)
+
+#define CAMERA_DEFAULT_VELOCITY (0.025f)
+
+/// Yaw/Pitch
 #define CAMERA_BOTTOM_PITCH_LIMIT (-89.0f)
 #define CAMERA_TOP_PITCH_LIMIT (89.0f)
-#define CAMERA_DEFAULT_VELOCITY (0.05f)
+#define CAMERA_DEFAULT_YAW (-90.0f)
+#define CAMERA_DEFAULT_PITCH (0.0f)
+
+/// Draw distances
+#define CAMERA_MIN_DRAW_DISTANCE (0.01f)
+#define CAMERA_MAX_DRAW_DISTANCE (100.0f)
 
 // Mouse settings
-#define MOUSE_SENSITIVITY (0.01f)
-#define DEFAULT_YAW (-90.0f)
+#define MOUSE_DEFAULT_SENSITIVITY (0.01f)

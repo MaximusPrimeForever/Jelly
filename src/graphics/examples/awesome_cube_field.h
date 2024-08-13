@@ -169,8 +169,8 @@ public:
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
 
-		this->program->SetMat4("view", this->cam->look_at);
-		this->program->SetMat4("projection", this->cam->projection);
+		this->program->SetMat4("view", this->cam->GetViewMatrix());
+		this->program->SetMat4("projection", this->cam->GetProjectionMatrix());
 
 		for (unsigned int i = 0; i < 10; i++)
 		{

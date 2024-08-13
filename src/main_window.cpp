@@ -63,18 +63,21 @@ void MainWindow::InitializeSettings()
 	// Set camera settings
 	this->camera = new Camera(
 		glm::vec3(0.0f, 0.0f, 3.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		CAMERA_DEFAULT_VERTICAL_FOV,
-		CAMERA_DEFAULT_VELOCITY
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		CAMERA_DEFAULT_YAW,
+		CAMERA_DEFAULT_PITCH
 	);
-	this->camera->SetYaw(DEFAULT_YAW);
+	this->camera->look_sensitivity = MOUSE_DEFAULT_SENSITIVITY;
 
 	// Set mouse settings
 	this->disable_cursor = false;
-
 	this->mouse.last_x = static_cast<float>(this->monitorDimensions.width) / 2.0f;
 	this->mouse.last_y = static_cast<float>(this->monitorDimensions.height) / 2.0f;
-	this->mouse.sensitivity = MOUSE_SENSITIVITY;
+}
+
+void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	g_mouse.scroll_y_offset = yoffset;
 }
 
 void MainWindow::InitializeGlfw()
@@ -120,6 +123,7 @@ void MainWindow::InitializeGlfw()
 
 	// TODO: Find a way to move data from callback function to MainWindow
 	//glfwSetCursorPosCallback(window, MouseCallback);
+	glfwSetScrollCallback(window, MouseScrollCallback);
 }
 
 void MainWindow::SetupOpenGL()
@@ -154,15 +158,54 @@ void MainWindow::UpdateCameraFromMouse()
 	double x_pos, y_pos;
 	glfwGetCursorPos(this->window, &x_pos, &y_pos);
 
-	this->mouse.delta_x = (static_cast<float>(x_pos) - this->mouse.last_x) * this->mouse.sensitivity;
-	this->mouse.delta_y = -1.0f * (static_cast<float>(y_pos) - this->mouse.last_y) * this->mouse.sensitivity;
+	float delta_x = (static_cast<float>(x_pos) - this->mouse.last_x);
+	float delta_y = -1.0f * (static_cast<float>(y_pos) - this->mouse.last_y);
 
 	this->mouse.last_x = static_cast<float>(x_pos);
 	this->mouse.last_y = static_cast<float>(y_pos);
 
+	// When cursor is enabled, ignore orientation changes but react to scrolling
+	this->camera->SetVerticalFovDelta(g_mouse.scroll_y_offset);
+
 	if (!this->disable_cursor) return;
-	this->camera->SetYaw(this->mouse.delta_x, true, false);
-	this->camera->SetPitch(this->mouse.delta_y, true, false);
+	this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
+}
+
+void MainWindow::UpdateCameraFromKeyboard() const
+{
+
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	float frame_time = 1000.0f / io.Framerate;
+
+	// X-axis
+	if (glfwGetKey(this->window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		this->settings_menu->shift_x += 0.01f;
+		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::RIGHT, frame_time);
+	}
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		this->settings_menu->shift_x -= 0.01f;
+		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::LEFT, frame_time);
+	}
+
+	// Y-axis
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		this->settings_menu->shift_y += 0.01f;
+		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::UP, frame_time);
+	}
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+		this->settings_menu->shift_y -= 0.01f;
+		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::DOWN, frame_time);
+	}
+
+	// Z-axis
+	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
+		this->settings_menu->shift_z -= 0.01f;
+		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::FORWARD, frame_time);
+	}
+	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		this->settings_menu->shift_z += 0.01f;
+		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::BACKWARD, frame_time);
+	}
 }
 
 bool MainWindow::GetMonitorDimensions()
@@ -184,10 +227,12 @@ void MainWindow::ProcessInput()
 {
 	// TODO: separate camera logic from user input
 
+	// Close window when pressing ESC
 	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
+	// Toggle mouse using HOME
 	if (glfwGetKey(this->window, GLFW_KEY_HOME) == GLFW_PRESS) {
 		this->disable_cursor = !this->disable_cursor;
 
@@ -198,44 +243,9 @@ void MainWindow::ProcessInput()
 		}
 	}
 
+	// Update camera from mouse and keyboard inputs
 	this->UpdateCameraFromMouse();
-
-	glm::vec3 camera_front = this->camera->GenerateNormDirection();
-	glm::vec3 camera_pos_delta = glm::vec3();
-
-	// X-axis
-	if (glfwGetKey(this->window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		this->settings_menu->shift_x += 0.01f;
-		camera_pos_delta += this->camera->right * this->camera->velocity;
-	}
-	if (glfwGetKey(this->window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		this->settings_menu->shift_x -= 0.01f;
-		camera_pos_delta += this->camera->right * -this->camera->velocity;
-	}
-
-	// Y-axis
-	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		this->settings_menu->shift_y += 0.01f;
-		camera_pos_delta += this->camera->up * this->camera->velocity;
-	}
-	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-		this->settings_menu->shift_y -= 0.01f;
-		camera_pos_delta += this->camera->up * -this->camera->velocity;
-	}
-
-	// Z-axis
-	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
-		this->settings_menu->shift_z -= 0.01f;
-		camera_pos_delta += camera_front * this->camera->velocity;
-	}
-	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		this->settings_menu->shift_z += 0.01f;
-		camera_pos_delta += camera_front * -this->camera->velocity;
-	}
-
-	// Set camera to point straight
-	this->camera->SetPosition(camera_pos_delta, true, false);
-	this->camera->SetTarget(this->camera->position + camera_front);
+	this->UpdateCameraFromKeyboard();
 
 	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
 }
@@ -284,6 +294,8 @@ void MainWindow::ShowImGui()
 	{
 		this->im_comp->Show();
 	}
+
+	this->camera->vfov = this->settings_menu->vfov;
 }
 
 void MainWindow::RenderOpenGL()
@@ -300,18 +312,6 @@ void MainWindow::RenderOpenGL()
 	}
 	else {
 		glDisable(GL_DEPTH_TEST);
-	}
-
-	// Computationally heavy tasks should be done only if UI has been updated
-	// To avoid running them every frame when values haven't changed
-	if (this->settings_menu->has_ui_updated)
-	{
-		/*
-		 * Note: interestingly, ProcessInput() modified values in the settings menu
-		 * which get reflected in ImGui, the sliders move, but doesn't trigger this condition.
-		 * ImGui methods must return `true` only if the user interacted with the widget directly
-		 */
-		this->camera->SetVFov(this->settings_menu->vfov);
 	}
 
 	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)

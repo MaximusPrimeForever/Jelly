@@ -1,5 +1,7 @@
 #include "widgets/settings_menu.h"
 
+#include "settings.h"
+
 
 SettingsMenu::SettingsMenu(double x_pos, double y_pos, ImFont* font) : BaseWidget(x_pos, y_pos, font)
 {
@@ -32,7 +34,12 @@ void SettingsMenu::Show()
 	ImGui::Text("OpenGL settings:");
 	this->has_ui_updated |= ImGui::Checkbox("Enable Wireframe", &this->enable_wireframe);
 	this->has_ui_updated |= ImGui::Checkbox("Enable depth testing", &this->enable_depth_testing);
-	this->has_ui_updated |= ImGui::SliderFloat("FOV (Vertical)", &this->vfov, 10.0f, 100.0f);
+	this->has_ui_updated |= ImGui::SliderFloat(
+		"FOV (Vertical)", 
+		&this->vfov, 
+		CAMERA_MIN_VERTICAL_FOV, 
+		CAMERA_MAX_VERTICAL_FOV
+	);
 
 	ImGui::Text("Widgets:");
 	this->has_ui_updated |= ImGui::Checkbox("Show ImageCompositor", &this->show_image_compositor);

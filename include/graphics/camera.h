@@ -4,34 +4,42 @@
 
 #include "settings.h"
 
+typedef enum camera_direction
+{
+	FORWARD = 0,
+	BACKWARD,
+	RIGHT,
+	LEFT,
+	UP,
+	DOWN
+} CAMERA_DIRECTION;
+
 class Camera
 {
 private:
-
+	void UpdateCameraVectors();
 public:
 	glm::vec3 position;
-	glm::vec3 target;
-	glm::vec3 right;
+	glm::vec3 front;
 	glm::vec3 up;
+	glm::vec3 right;
+	glm::vec3 world_up;
 
 	float vfov;
 	float pitch = 0.0f;
 	float yaw = 0.0f;
 	float velocity = 0.0f;
 
-	glm::mat4 look_at;
-	glm::mat4 projection;
+	/*float yaw_offset = 0.0f;
+	float pitch_offset = 0.0f;*/
+	float look_sensitivity;
 
-	Camera(glm::vec3 position, glm::vec3 target, float vfov, float velocity);
-	void GenerateLookAtMat();
-	glm::vec3 GenerateNormDirection() const;
+	Camera(glm::vec3 position = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 world_up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = CAMERA_DEFAULT_YAW, float pitch = CAMERA_DEFAULT_PITCH);
 
-	void SetPosition(glm::vec3 new_position, bool use_as_delta = false, bool update_look_at = true);
-	void SetTarget(glm::vec3 new_target, bool use_as_delta = false, bool update_look_at = true);
-	void SetTargetRelToPos(glm::vec3 new_target, bool update_look_at = true);
-	void SetParameters(glm::vec3 new_position, glm::vec3 new_target);
+	glm::mat4 GetViewMatrix() const;
+	glm::mat4 GetProjectionMatrix() const;
 
-	void SetVFov(float vfov);
-	void SetPitch(float new_pitch, bool use_as_delta = false, bool update_look_at = true);
-	void SetYaw(float new_yaw, bool use_as_delta = false, bool update_look_at = true);
+	void ProcessAxisLockedMovement(CAMERA_DIRECTION direction, float delta_time);
+	void ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool constrain_pitch = true);
+	void SetVerticalFovDelta(float delta_fov);
 };
