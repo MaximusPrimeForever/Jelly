@@ -29,6 +29,15 @@ typedef struct Monitor_t
 	float height_dpi_scale;
 } Monitor;
 
+typedef struct Mouse_t
+{
+	float last_x;
+	float last_y;
+	float delta_x;
+	float delta_y;
+	float sensitivity;
+} Mouse;
+
 class MainWindow
 {
 private:
@@ -38,6 +47,7 @@ private:
 	ImVec4 background_color;
 
 	// Settings
+	bool disable_cursor;
 	SettingsMenu* settings_menu;
 
 	// Widgets
@@ -45,6 +55,7 @@ private:
 	ImFont* font;
 
 	// OpenGL
+	Mouse mouse;
 	Camera* camera;
 	RenderTarget* render_targets[RENDER_TARGET_COUNT] = { 0 };
 	float mix_value = 0.5;
@@ -57,9 +68,16 @@ private:
 	void ShowImGui();
 	void RenderOpenGL();
 	void SetupOpenGL();
+
 public:
 	MainWindow();
 	~MainWindow();
+
+	void UpdateCameraFromMouse();
 	bool ShouldClose();
 	void Show();
+	void InitializeSettings();
 };
+
+inline Mouse g_mouse;
+void MouseCallback(GLFWwindow* window, double xpos, double ypos);

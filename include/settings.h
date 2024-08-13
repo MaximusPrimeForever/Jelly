@@ -10,4 +10,12 @@
 #define DEFAULT_FG_IMAGE_PATH ".\\imgs\\teapot.png"
 #define APP_NAME "Jelly"
 
-#define DEFAULT_VERTICAL_FOV (45.0f)
+// Camera settings
+#define CAMERA_DEFAULT_VERTICAL_FOV (45.0f)
+#define CAMERA_BOTTOM_PITCH_LIMIT (-89.0f)
+#define CAMERA_TOP_PITCH_LIMIT (89.0f)
+#define CAMERA_DEFAULT_VELOCITY (0.05f)
+
+// Mouse settings
+#define MOUSE_SENSITIVITY (0.01f)
+#define DEFAULT_YAW (-90.0f)

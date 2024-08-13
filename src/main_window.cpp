@@ -12,6 +12,7 @@
 #include "settings.h"
 #include "main_window.h"
 
+#include <functional>
 #include <stb_image.h>
 
 #include "graphics/examples/texured_rectangle.h"
@@ -35,11 +36,7 @@ MainWindow::MainWindow()
 	ImGui_ImplGlfw_InitForOpenGL(this->window, true);
 	ImGui_ImplOpenGL3_Init(this->glsl_version);
 
-	this->camera = new Camera(
-		glm::vec3(0.0f, 0.0f, 3.0f), 
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		DEFAULT_VERTICAL_FOV
-	);
+	this->InitializeSettings();
 
 	this->SetupOpenGL();
 
@@ -59,6 +56,25 @@ MainWindow::~MainWindow()
 
     glfwDestroyWindow(this->window);
     glfwTerminate();
+}
+
+void MainWindow::InitializeSettings()
+{
+	// Set camera settings
+	this->camera = new Camera(
+		glm::vec3(0.0f, 0.0f, 3.0f),
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		CAMERA_DEFAULT_VERTICAL_FOV,
+		CAMERA_DEFAULT_VELOCITY
+	);
+	this->camera->SetYaw(DEFAULT_YAW);
+
+	// Set mouse settings
+	this->disable_cursor = false;
+
+	this->mouse.last_x = static_cast<float>(this->monitorDimensions.width) / 2.0f;
+	this->mouse.last_y = static_cast<float>(this->monitorDimensions.height) / 2.0f;
+	this->mouse.sensitivity = MOUSE_SENSITIVITY;
 }
 
 void MainWindow::InitializeGlfw()
@@ -101,6 +117,19 @@ void MainWindow::InitializeGlfw()
 
 	glfwMakeContextCurrent(this->window);
 	glfwSwapInterval(1); // Enable vsync
+
+	// TODO: Find a way to move data from callback function to MainWindow
+	//glfwSetCursorPosCallback(window, MouseCallback);
+}
+
+void MainWindow::SetupOpenGL()
+{
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
+	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
+	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
+	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate));
 }
 
 void MainWindow::InitializeImGui()
@@ -120,6 +149,22 @@ void MainWindow::InitializeImGui()
 	ImGui::GetStyle().ScaleAllSizes(this->monitorDimensions.height_dpi_scale);
 }
 
+void MainWindow::UpdateCameraFromMouse()
+{
+	double x_pos, y_pos;
+	glfwGetCursorPos(this->window, &x_pos, &y_pos);
+
+	this->mouse.delta_x = (static_cast<float>(x_pos) - this->mouse.last_x) * this->mouse.sensitivity;
+	this->mouse.delta_y = -1.0f * (static_cast<float>(y_pos) - this->mouse.last_y) * this->mouse.sensitivity;
+
+	this->mouse.last_x = static_cast<float>(x_pos);
+	this->mouse.last_y = static_cast<float>(y_pos);
+
+	if (!this->disable_cursor) return;
+	this->camera->SetYaw(this->mouse.delta_x, true, false);
+	this->camera->SetPitch(this->mouse.delta_y, true, false);
+}
+
 bool MainWindow::GetMonitorDimensions()
 {
 	GLFWmonitor* primary_monitor = glfwGetPrimaryMonitor();
@@ -137,46 +182,59 @@ bool MainWindow::GetMonitorDimensions()
 
 void MainWindow::ProcessInput()
 {
+	// TODO: separate camera logic from user input
+
 	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	float camera_speed = 0.05f;
+	if (glfwGetKey(this->window, GLFW_KEY_HOME) == GLFW_PRESS) {
+		this->disable_cursor = !this->disable_cursor;
+
+		if (this->disable_cursor) {
+ 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		} else {
+			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+	}
+
+	this->UpdateCameraFromMouse();
+
+	glm::vec3 camera_front = this->camera->GenerateNormDirection();
 	glm::vec3 camera_pos_delta = glm::vec3();
-	glm::vec3 camera_front = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	// X-axis
 	if (glfwGetKey(this->window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		this->settings_menu->shift_x += 0.01f;
-		camera_pos_delta += this->camera->right * camera_speed;
+		camera_pos_delta += this->camera->right * this->camera->velocity;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		this->settings_menu->shift_x -= 0.01f;
-		camera_pos_delta += this->camera->right * -camera_speed;
+		camera_pos_delta += this->camera->right * -this->camera->velocity;
 	}
 
 	// Y-axis
 	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		this->settings_menu->shift_y += 0.01f;
-		camera_pos_delta += this->camera->up * camera_speed;
+		camera_pos_delta += this->camera->up * this->camera->velocity;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 		this->settings_menu->shift_y -= 0.01f;
-		camera_pos_delta += this->camera->up * -camera_speed;
+		camera_pos_delta += this->camera->up * -this->camera->velocity;
 	}
 
 	// Z-axis
 	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
 		this->settings_menu->shift_z -= 0.01f;
-		camera_pos_delta += camera_front * camera_speed;
+		camera_pos_delta += camera_front * this->camera->velocity;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		this->settings_menu->shift_z += 0.01f;
-		camera_pos_delta += camera_front * -camera_speed;
+		camera_pos_delta += camera_front * -this->camera->velocity;
 	}
 
 	// Set camera to point straight
-	this->camera->AddPositionDelta(camera_pos_delta, false);
+	this->camera->SetPosition(camera_pos_delta, true, false);
 	this->camera->SetTarget(this->camera->position + camera_front);
 
 	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
@@ -293,12 +351,3 @@ void MainWindow::RenderOpenGL()
 	}
 }
 
-void MainWindow::SetupOpenGL()
-{
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
-	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
-	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
-	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera,&io.Framerate));
-}

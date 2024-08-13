@@ -28,6 +28,7 @@ void SettingsMenu::Show()
 	ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
 	ImGui::Begin("Settings Menu");
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+	ImGui::Text("Press HOME to release mouse");
 	ImGui::Text("OpenGL settings:");
 	this->has_ui_updated |= ImGui::Checkbox("Enable Wireframe", &this->enable_wireframe);
 	this->has_ui_updated |= ImGui::Checkbox("Enable depth testing", &this->enable_depth_testing);
