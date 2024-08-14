@@ -7,13 +7,9 @@
 #include <graphics/camera.h>
 #include <graphics/awesome_gl.h>
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "settings.h"
-
-#define GRID_SIZE (2.0f)
-#define GRID_HALF_SIZE (GRID_SIZE / 2.0)
+#define CELL_COUNT (20.0f)
 
 class XzGrid : RenderTarget
 {
@@ -29,10 +25,10 @@ public:
 	{
 		GLuint vbo[2], ebo;
 		float vertices[] = {
-			-GRID_HALF_SIZE, -GRID_HALF_SIZE, 0.0, 0.0,
-			-GRID_HALF_SIZE,  GRID_HALF_SIZE, 0.0, 20.0,
-			 GRID_HALF_SIZE, -GRID_HALF_SIZE, 20.0, 0.0,
-			 GRID_HALF_SIZE,  GRID_HALF_SIZE, 20.0, 20.0
+			-1.0, -1.0, 0.0,		0.0,
+			-1.0,  1.0, 0.0,		CELL_COUNT,
+			 1.0, -1.0, CELL_COUNT, 0.0,
+			 1.0,  1.0, CELL_COUNT, CELL_COUNT
 		};
 		GLuint indices[] = {
 			0,1,2,
@@ -98,10 +94,15 @@ public:
 			this->grid_program_->SetMat4("view", this->cam->GetViewMatrix());
 			this->grid_program_->SetMat4("projection", this->cam->GetProjectionMatrix());
 
-			//glDrawArrays(GL_LINE, 0, 44);
 			glBindVertexArray(this->grid_vao_);
+
+			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->texture);
+
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 		glBindVertexArray(0);

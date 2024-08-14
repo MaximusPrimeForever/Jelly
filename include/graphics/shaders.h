@@ -24,6 +24,7 @@ public:
 
 	// use/activate the shader
 	void Use() const;
+	void Invalidate() const;
 
 	// utility uniform functions
 	void SetBool(const std::string& name, bool value) const;

@@ -300,10 +300,11 @@ void MainWindow::ProcessInput()
 
 void MainWindow::SetupOpenGL()
 {
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	// Enable alpha blending (settings stolen from learnopengl.com without further thought)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
 	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
 	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));

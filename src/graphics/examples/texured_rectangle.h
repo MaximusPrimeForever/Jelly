@@ -126,8 +126,12 @@ public:
 		this->program->SetMat4("projection", this->projection);
 
 		glBindVertexArray(this->vao);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, this->texture);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glBindVertexArray(0);
 	}
