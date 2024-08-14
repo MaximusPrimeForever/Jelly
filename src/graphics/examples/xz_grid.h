@@ -10,7 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #define CELL_COUNT (20.0f)
-#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE	// very naughty
 
 class XzGrid : RenderTarget
 {

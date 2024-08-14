@@ -25,8 +25,9 @@ private:
 	ShaderProgram* light_program_ = nullptr;
 
 	glm::vec3 obj_position_ = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 light_pos_ = glm::vec3(1.2f, 1.0f, -2.0f);
+	glm::vec3 light_pos_ = glm::vec3(1.2f, 1.0f, 1.0f);
 
+	glm::mat3 obj_normal_mat_;
 	glm::mat4 obj_model_mat_;
 	glm::mat4 light_model_mat_;
 
@@ -135,7 +136,7 @@ public:
 	void Render() override
 	{
 		float frame_time = 1.0f / (*this->fps_);
-		glm::vec3 temp_light_pos = this->light_pos_ + this->light_shift * 10.0f;
+		glm::vec3 temp_light_pos = this->light_pos_ + this->light_shift * 5.0f;
 
 		// Render light
 		{
@@ -158,8 +159,21 @@ public:
 			glBindVertexArray(this->obj_vao_);
 			this->objects_program_->Use();
 
+			this->obj_model_mat_ = glm::rotate(
+				this->obj_model_mat_,
+				(float)(glm::radians(50.0f * frame_time)),
+				glm::vec3(0.0f, 1.0f, 0.0f)
+			);
+			this->obj_normal_mat_ = glm::mat3(glm::transpose(glm::inverse(
+				this->cam->GetViewMatrix() * this->obj_model_mat_
+			)));
+
 			this->objects_program_->SetVec3("uLightPos", temp_light_pos);
 			this->objects_program_->SetVec3("uLightColor", this->light_color);
+			this->objects_program_->SetVec3("uCamWorldPos", this->cam->position);
+
+			this->objects_program_->SetMat3("uNormalMatrix", this->obj_normal_mat_);
+
 			this->objects_program_->SetMat4("uModel", this->obj_model_mat_);
 			this->objects_program_->SetMat4("uView", this->cam->GetViewMatrix());
 			this->objects_program_->SetMat4("uProjection", this->cam->GetProjectionMatrix());
