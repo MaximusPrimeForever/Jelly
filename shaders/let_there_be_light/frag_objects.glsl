@@ -1,14 +1,26 @@
 #version 330 core
-out vec4 frag_color;
+out vec4 oFragColor;
 
-uniform vec3 object_color;
-uniform vec3 light_color;
+in vec3 ioNormal;
+in vec3 ioFragWorldPos;
+
+uniform vec3 uObjectColor;
+uniform vec3 uLightColor;
+uniform vec3 uLightPos;
+
 
 void main()
 {
+    // ambient
     float ambient_strength = 0.1;
-    vec3 ambient = ambient_strength * light_color;
+    vec3 ambient = ambient_strength * uLightColor;
+    
+    // diffuse
+    vec3 norm = normalize(ioNormal);
+    vec3 light_ray = normalize(uLightPos - ioFragWorldPos);
+    float diff = max(dot(norm, light_ray), 0.0);
+    vec3 diffuse = diff * uLightColor;
 
-    vec3 result = ambient * object_color;
-    frag_color = vec4(result, 1.0);
+    vec3 result = (ambient + diffuse)* uObjectColor;
+    oFragColor = vec4(result, 1.0);
 }

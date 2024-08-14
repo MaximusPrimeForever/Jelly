@@ -100,12 +100,14 @@ public:
 		glBindVertexArray(this->obj_vao_);
 		glGenBuffers(2, vbo);
 
+		// Cube vertices
 		vertex_attrb = 0;
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(vertex_attrb, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(vertex_attrb);
 
+		// Normal vectors
 		vertex_attrb = 1;
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -114,7 +116,7 @@ public:
 
 		this->objects_program_->Use();
 		this->obj_model_mat_ = glm::translate(glm::mat4(1.0f), this->obj_position_);
-		this->objects_program_->SetVec3("object_color", glm::vec3(1.0f, 0.5f, 0.31f));
+		this->objects_program_->SetVec3("uObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 
 		// Setup light
 		glGenBuffers(1, &light_vbo);
@@ -128,41 +130,42 @@ public:
 		glEnableVertexAttribArray(vertex_attrb);
 
 		this->light_program_->Use();
-		this->light_model_mat_ = glm::translate(glm::mat4(1.0f), this->light_pos_);
-		this->light_model_mat_ = glm::scale(this->light_model_mat_, glm::vec3(0.2f));
 	}
 
 	void Render() override
 	{
 		float frame_time = 1.0f / (*this->fps_);
-
-		// Render objects
-		{
-			glBindVertexArray(this->obj_vao_);
-			this->objects_program_->Use();
-
-			this->objects_program_->SetVec3("light_color", this->light_color);
-			this->objects_program_->SetMat4("model", this->obj_model_mat_);
-			this->objects_program_->SetMat4("view", this->cam->GetViewMatrix());
-			this->objects_program_->SetMat4("projection", this->cam->GetProjectionMatrix());
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glm::vec3 temp_light_pos = this->light_pos_ + this->light_shift * 10.0f;
 
 		// Render light
 		{
 			glBindVertexArray(this->light_vao_);
 			this->light_program_->Use();
 
-			this->light_program_->SetVec3("light_color", this->light_color);
-			this->light_program_->SetVec3("offset", this->light_shift);
-			this->light_program_->SetMat4("model", this->light_model_mat_);
-			this->light_program_->SetMat4("view", this->cam->GetViewMatrix());
-			this->light_program_->SetMat4("projection", this->cam->GetProjectionMatrix());
+			this->light_model_mat_ = glm::translate(glm::mat4(1.0f), temp_light_pos);
+			this->light_model_mat_ = glm::scale(this->light_model_mat_, glm::vec3(0.2f));
+
+			this->light_program_->SetVec3("uLightColor", this->light_color);
+			this->light_program_->SetMat4("uModel", this->light_model_mat_);
+			this->light_program_->SetMat4("uView", this->cam->GetViewMatrix());
+			this->light_program_->SetMat4("uProjection", this->cam->GetProjectionMatrix());
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
+		// Render objects
+		{
+			glBindVertexArray(this->obj_vao_);
+			this->objects_program_->Use();
+
+			this->objects_program_->SetVec3("uLightPos", temp_light_pos);
+			this->objects_program_->SetVec3("uLightColor", this->light_color);
+			this->objects_program_->SetMat4("uModel", this->obj_model_mat_);
+			this->objects_program_->SetMat4("uView", this->cam->GetViewMatrix());
+			this->objects_program_->SetMat4("uProjection", this->cam->GetProjectionMatrix());
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		glBindVertexArray(0);
 	}

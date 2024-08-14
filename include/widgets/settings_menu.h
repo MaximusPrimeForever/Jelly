@@ -80,9 +80,9 @@ public:
 			MOUSE_MAX_SENSITIVITY
 		);
 		ImGui::SeparatorText("XYZ sliders");
-		this->has_ui_updated |= ImGui::SliderFloat("X-Axis", &this->shift_x, 0.0f, 1.0f);
-		this->has_ui_updated |= ImGui::SliderFloat("Y-Axis", &this->shift_y, 0.0f, 1.0f);
-		this->has_ui_updated |= ImGui::SliderFloat("Z-Axis", &this->shift_z, 0.0f, 1.0f);
+		this->has_ui_updated |= ImGui::SliderFloat("X-Axis", &this->shift_x, -1.0f, 1.0f);
+		this->has_ui_updated |= ImGui::SliderFloat("Y-Axis", &this->shift_y, -1.0f, 1.0f);
+		this->has_ui_updated |= ImGui::SliderFloat("Z-Axis", &this->shift_z, -1.0f, 1.0f);
 
 		ImGui::SeparatorText("Color Picker");
 		ImGuiColorEditFlags flags;

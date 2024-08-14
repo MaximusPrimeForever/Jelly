@@ -227,31 +227,25 @@ void MainWindow::UpdateCameraFromKeyboard() const
 
 	// X-axis
 	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS) {
-		this->settings_menu->shift_x += 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::RIGHT, frame_time);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS) {
-		this->settings_menu->shift_x -= 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::LEFT, frame_time);
 	}
 
 	// Y-axis
 	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		this->settings_menu->shift_y += 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::UP, frame_time);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-		this->settings_menu->shift_y -= 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::DOWN, frame_time);
 	}
 
 	// Z-axis
 	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS) {
-		this->settings_menu->shift_z -= 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::FORWARD, frame_time);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS) {
-		this->settings_menu->shift_z += 0.01f;
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::BACKWARD, frame_time);
 	}
 }
