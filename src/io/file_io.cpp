@@ -21,7 +21,7 @@ std::string read_file_contents(const char* path) {
 }
 
 // Simple helper function to load an image into a OpenGL texture with common settings
-bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_width, int* out_height, bool flip_vertically, bool generate_mipmaps)
+bool LoadTextureFromFile(const char* filename, GLuint* out_texture, bool flip_vertically, bool generate_mipmaps, int* out_width, int* out_height)
 {
     stbi_set_flip_vertically_on_load(flip_vertically);
 
@@ -72,8 +72,8 @@ bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_wid
     if (generate_mipmaps) glGenerateMipmap(GL_TEXTURE_2D);
 
     *out_texture = image_texture;
-    *out_width = image_width;
-    *out_height = image_height;
+    if (out_width != nullptr) *out_width = image_width;
+    if (out_height != nullptr) *out_height = image_height;
 
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_set_flip_vertically_on_load(false);

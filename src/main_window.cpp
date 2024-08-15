@@ -124,11 +124,14 @@ void MainWindow::InitializeGlfw()
 		throw std::exception("Failed to create main window. Aborting..");
 	}
 
+	GLFWimage image;
+	image.pixels = stbi_load("resources\\Prismatic_Jelly.png", &image.width, &image.height, 0, 4); //rgba channels 
+	glfwSetWindowIcon(window, 1, &image);
+	stbi_image_free(image.pixels);
+
 	glfwMakeContextCurrent(this->window);
 	glfwSwapInterval(1); // Enable vsync
 
-	// TODO: Find a way to move data from callback function to MainWindow
-	//glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, MouseScrollCallback);
 }
 

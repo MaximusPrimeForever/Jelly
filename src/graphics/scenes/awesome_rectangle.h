@@ -82,17 +82,13 @@ public:
 		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0);
 		glEnableVertexAttribArray(3);
 
-		int width, height, nrChannels;
 		glGenTextures(2, this->texture);
-
-		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture[0], &width, &height, true)) {
-			throw std::exception("Failed to load image.");
+		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture[0])) {
+			throw std::exception("Failed to load image.", true);
 		}
-
 		// End wooden cube
 		// Start awesome face
-
-		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], &width, &height, true)) {
+		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], true)) {
 			throw std::exception("Failed to load image.");
 		}
 

@@ -116,44 +116,41 @@ public:
 		glGenVertexArrays(1, &this->obj_vao_);
 		glGenBuffers(1, &vbo);
 
-		// Load vertices data
+		/// Load vertices data
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 		glBindVertexArray(this->obj_vao_);
 
-		// Cube vertices
+		/// Cube vertices
 		vertex_attrb = 0;
 		glVertexAttribPointer(vertex_attrb, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(vertex_attrb);
 
-		// Normal vectors
+		/// Normal vectors
 		vertex_attrb = 1;
 		glVertexAttribPointer(vertex_attrb, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(vertex_attrb);
-
-		// Texture coords
+		
+		/// Texture coords
 		vertex_attrb = 2;
 		glVertexAttribPointer(vertex_attrb, 2, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(vertex_attrb);
 
-		int img_width, img_height;
-		if (!LoadTextureFromFile("textures\\steel_box_diffuse.png", &this->obj_texture_diffuse_, &img_width, &img_height))
-		{
+		if (!LoadTextureFromFile("textures\\steel_box_diffuse.png", &this->obj_texture_diffuse_)) {
 			throw std::exception("Failed to load image.");
 		}
-		if (!LoadTextureFromFile("textures\\steel_box_specular.png", &this->obj_texture_specular_, &img_width, &img_height))
-		{
+		if (!LoadTextureFromFile("textures\\steel_box_specular.png", &this->obj_texture_specular_)) {
 			throw std::exception("Failed to load image.");
 		}
-		if (!LoadTextureFromFile("textures\\matrix.jpg", &this->obj_texture_emission_, &img_width, &img_height))
-		{
+		if (!LoadTextureFromFile("textures\\matrix.jpg", &this->obj_texture_emission_)) {
 			throw std::exception("Failed to load image.");
 		}
 
 		glBindTexture(GL_TEXTURE_2D, this->obj_texture_diffuse_);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0);
 
+		/// This texture gets cropped in the fragment shader by using coords outside the 0-1 range
 		glBindTexture(GL_TEXTURE_2D, this->obj_texture_emission_);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);

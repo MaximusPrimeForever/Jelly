@@ -74,8 +74,7 @@ public:
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 		glEnableVertexAttribArray(2);
 
-		int width, height;
-		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture, &width, &height, true)) {
+		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture, true)) {
 			throw std::exception("Failed to load image.");
 		}
 

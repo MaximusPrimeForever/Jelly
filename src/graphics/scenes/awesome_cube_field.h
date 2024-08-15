@@ -28,7 +28,6 @@ public:
 	AwesomeCubeField(Camera* cam, float* fps) : RenderTarget(cam), fps(fps), mix_value(0.2f)
 	{
 		GLuint vbo, vbo_face;
-		int width, height, nrChannels;
 		float vertices[] = {
 			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -98,7 +97,7 @@ public:
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float) * 3));
 		glEnableVertexAttribArray(1);
 
-		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture[0], &width, &height, true)) {
+		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture[0], true)) {
 			throw std::exception("Failed to load image.");
 		}
 
@@ -110,7 +109,7 @@ public:
 		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 		//glEnableVertexAttribArray(2);
 
-		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], &width, &height, true)) {
+		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], true)) {
 			throw std::exception("Failed to load image.");
 		}
 

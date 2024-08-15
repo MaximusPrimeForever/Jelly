@@ -53,17 +53,20 @@ public:
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		/// Vertices
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(0);
 
+		/// Texture coords
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
+		/// Elements
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		int width, height;
-		if (!LoadTextureFromFile(".\\textures\\grid_cell.png", &this->texture, &width, &height, true)) {
+		if (!LoadTextureFromFile(".\\textures\\grid_cell.png", &this->texture)) {
 			throw std::exception("Failed to load image.");
 		}
 		glBindTexture(GL_TEXTURE_2D, this->texture);
@@ -71,7 +74,6 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		this->grid_program_->Use();
-
 		this->grid_model_mat_ = glm::mat4(1.0f);
 		this->grid_model_mat_ = glm::scale(this->grid_model_mat_, glm::vec3(2.0f));
 		this->grid_program_->SetMat4("model", this->grid_model_mat_);
