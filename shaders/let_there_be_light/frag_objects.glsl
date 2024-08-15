@@ -1,7 +1,7 @@
 #version 330 core
 out vec4 oFragColor;
 
-in vec2 ioDiffuseTexCoords;
+in vec2 ioTexCoords;
 in vec3 ioNormal;
 in vec3 ioFragViewPos;
 in vec3 ioLightPos;
@@ -13,7 +13,8 @@ struct Light {
 };
 struct Material {
     sampler2D diffuse;
-    vec3 specular;
+    sampler2D specular;
+    sampler2D emission;
     float shininess;
 };
 
@@ -38,11 +39,17 @@ void main()
     vec3 reflected = reflect(incidentRay, norm);
     float spec = pow(max(dot(cameraToFrag, reflected), 0.0), uMaterial.shininess);
 
-    vec3 fragDiffColor = vec3(texture(uMaterial.diffuse, ioDiffuseTexCoords));
+    vec3 fragDiffColor = vec3(texture(uMaterial.diffuse, ioTexCoords));
+    vec3 fragSpecColor = vec3(texture(uMaterial.specular, ioTexCoords));
+
+    vec2 emisCoord = (ioTexCoords * 1.2) - 0.1;
+    vec3 fragEmisColor = vec3(texture(uMaterial.emission, emisCoord));
+
     vec3 ambient =  uLight.ambient  * fragDiffColor;
     vec3 diffuse =  uLight.diffuse  * (diff * fragDiffColor);
-    vec3 specular = uLight.specular * (spec * uMaterial.specular);
+    vec3 specular = uLight.specular * (spec * fragSpecColor);
+    vec3 emission = fragEmisColor;
 
-    vec3 result = ambient + diffuse + specular;
+    vec3 result = ambient + diffuse + specular + fragEmisColor;
     oFragColor = vec4(result, 1.0);
 }

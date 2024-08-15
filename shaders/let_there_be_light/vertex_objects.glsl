@@ -6,7 +6,7 @@ layout (location = 2) in vec2 iTexCoords;
 out vec3 ioNormal;
 out vec3 ioFragViewPos;
 out vec3 ioLightPos;
-out vec2 ioDiffuseTexCoords;
+out vec2 ioTexCoords;
 
 uniform mat4 uModel;
 uniform mat4 uView;
@@ -25,5 +25,5 @@ void main()
 
     // uNormalMatrix is derived from view*model in CPU code
     ioNormal =  uNormalMatrix * iNormal;
-    ioDiffuseTexCoords = iTexCoords;
+    ioTexCoords = iTexCoords;
 }

@@ -9,7 +9,6 @@ class SettingsMenu : BaseWidget
 public:
     bool enable_wireframe;
     bool enable_depth_testing;
-    bool show_image_compositor;
     float vfov;
     float shift_x;
     float shift_y;
@@ -33,7 +32,6 @@ public:
 		this->shift_y = 0.0f;
 		this->shift_z = 0.0f;
 		this->enable_wireframe = false;
-		this->show_image_compositor = false;
 		this->enable_depth_testing = false;
 		this->vfov = CAMERA_DEFAULT_VERTICAL_FOV;
 
@@ -60,7 +58,7 @@ public:
 		ImGui::Text("Press HOME to release mouse");
 
 		ImGui::SeparatorText("OpenGL settings");
-		this->has_ui_updated |= ImGui::Checkbox("Enable Wireframe", &this->enable_wireframe);
+		this->has_ui_updated |= ImGui::Checkbox("Enable wireframe", &this->enable_wireframe);
 		this->has_ui_updated |= ImGui::Checkbox("Enable depth testing", &this->enable_depth_testing);
 		this->has_ui_updated |= ImGui::Checkbox("Show grid", &this->show_grid);
 
@@ -96,8 +94,7 @@ public:
 			this->color_buffer[3]
 		);
 
-		ImGui::SeparatorText("Widgets");
-		this->has_ui_updated |= ImGui::Checkbox("Show ImageCompositor", &this->show_image_compositor);
+		ImGui::SeparatorText("Scenes");
 		this->has_ui_updated |= ImGui::Checkbox("Show textured rectangle", &this->show_textured_rect);
 		this->has_ui_updated |= ImGui::Checkbox("Show awesome rectangle", &this->show_awesome_rect);
 		this->has_ui_updated |= ImGui::Checkbox("Show awesome cube", &this->show_awesome_cube);

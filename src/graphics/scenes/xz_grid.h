@@ -26,7 +26,7 @@ private:
 public:
 	XzGrid(Camera* cam) : RenderTarget(cam)
 	{
-		GLuint vbo[2], ebo;
+		GLuint vbo, ebo;
 		float vertices[] = {
 			-1.0, -1.0, 0.0,		0.0,
 			-1.0,  1.0, 0.0,		CELL_COUNT,
@@ -48,16 +48,14 @@ public:
 		glGenVertexArrays(1, &this->grid_vao_);
 		glBindVertexArray(this->grid_vao_);
 
-		glGenBuffers(2, vbo);
+		glGenBuffers(1, &vbo);
 		glGenBuffers(1, &ebo);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
@@ -68,13 +66,15 @@ public:
 		if (!LoadTextureFromFile(".\\textures\\grid_cell.png", &this->texture, &width, &height, true)) {
 			throw std::exception("Failed to load image.");
 		}
+		glBindTexture(GL_TEXTURE_2D, this->texture);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		this->grid_program_->Use();
 
 		this->grid_model_mat_ = glm::mat4(1.0f);
 		this->grid_model_mat_ = glm::scale(this->grid_model_mat_, glm::vec3(2.0f));
 		this->grid_program_->SetMat4("model", this->grid_model_mat_);
-
 		this->grid_program_->SetInt("tex", AGL_SAMPLER_TEXTURE0);
 	}
 

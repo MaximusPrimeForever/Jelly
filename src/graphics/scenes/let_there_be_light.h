@@ -40,7 +40,9 @@ private:
 	glm::mat4 obj_model_mat_;
 	glm::mat4 light_model_mat_;
 
-	GLuint obj_texture_id;
+	GLuint obj_texture_diffuse_;
+	GLuint obj_texture_specular_;
+	GLuint obj_texture_emission_;
 
 public:
 	glm::vec3 light_shift;
@@ -48,12 +50,10 @@ public:
 
 	LetThereBeLight(Camera* cam, float* fps) : RenderTarget(cam), fps_(fps)
 	{
-		constexpr GLuint vbo_count = 3;
 		constexpr GLuint stride = 8;
 
+		GLuint vbo;
 		GLuint vertex_attrb;
-		GLuint vbo[vbo_count];
-		GLuint light_vbo;
 
 		float vertices[] = {
 			// positions          // normals           // texture coords
@@ -114,48 +114,61 @@ public:
 
 		// Setup obj
 		glGenVertexArrays(1, &this->obj_vao_);
+		glGenBuffers(1, &vbo);
+
+		// Load vertices data
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
 		glBindVertexArray(this->obj_vao_);
-		glGenBuffers(vbo_count, vbo);
 
 		// Cube vertices
 		vertex_attrb = 0;
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[vertex_attrb]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(vertex_attrb, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(vertex_attrb);
 
 		// Normal vectors
 		vertex_attrb = 1;
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[vertex_attrb]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(vertex_attrb, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(vertex_attrb);
 
 		// Texture coords
 		vertex_attrb = 2;
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[vertex_attrb]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(vertex_attrb, 2, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(vertex_attrb);
 
 		int img_width, img_height;
-		if (!LoadTextureFromFile("textures\\steel_box.png", &this->obj_texture_id, &img_width, &img_height))
+		if (!LoadTextureFromFile("textures\\steel_box_diffuse.png", &this->obj_texture_diffuse_, &img_width, &img_height))
 		{
 			throw std::exception("Failed to load image.");
 		}
+		if (!LoadTextureFromFile("textures\\steel_box_specular.png", &this->obj_texture_specular_, &img_width, &img_height))
+		{
+			throw std::exception("Failed to load image.");
+		}
+		if (!LoadTextureFromFile("textures\\matrix.jpg", &this->obj_texture_emission_, &img_width, &img_height))
+		{
+			throw std::exception("Failed to load image.");
+		}
+
+		glBindTexture(GL_TEXTURE_2D, this->obj_texture_diffuse_);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0);
+
+		glBindTexture(GL_TEXTURE_2D, this->obj_texture_emission_);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		this->objects_program_->Use();
 		this->obj_model_mat_ = glm::translate(glm::mat4(1.0f), this->obj_position_);
 		this->objects_program_->SetVec3("uObjectColor", MATERIAL_COLOR);
 
 		// Setup light
-		glGenBuffers(1, &light_vbo);
 		glGenVertexArrays(1, &this->light_vao_);
 		glBindVertexArray(this->light_vao_);
 
 		vertex_attrb = 0;
-		glBindBuffer(GL_ARRAY_BUFFER, light_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(vertex_attrb, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(vertex_attrb);
 
@@ -194,11 +207,11 @@ public:
 			glBindVertexArray(this->obj_vao_);
 			this->objects_program_->Use();
 
-			this->obj_model_mat_ = glm::rotate(
-				this->obj_model_mat_,
-				(float)(glm::radians(50.0f * frame_time)),
-				glm::vec3(0.0f, 1.0f, 0.0f)
-			);
+			//this->obj_model_mat_ = glm::rotate(
+			//	this->obj_model_mat_,
+			//	(float)(glm::radians(50.0f * frame_time)),
+			//	glm::vec3(0.0f, 1.0f, 0.0f)
+			//);
 			this->obj_normal_mat_ = glm::mat3(glm::transpose(glm::inverse(
 				view_matrix * this->obj_model_mat_
 			)));
@@ -217,9 +230,15 @@ public:
 
 			// Set light properties
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, this->obj_texture_id);
+			glBindTexture(GL_TEXTURE_2D, this->obj_texture_diffuse_);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, this->obj_texture_specular_);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, this->obj_texture_emission_);
+
 			this->objects_program_->SetInt("uMaterial.diffuse", AGL_SAMPLER_TEXTURE0);
-			this->objects_program_->SetVec3("uMaterial.specular", glm::vec3(0.5f));
+			this->objects_program_->SetInt("uMaterial.specular", AGL_SAMPLER_TEXTURE1);
+			this->objects_program_->SetInt("uMaterial.emission", AGL_SAMPLER_TEXTURE2);
 			this->objects_program_->SetFloat("uMaterial.shininess", MATERIAL_SHININESS);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
