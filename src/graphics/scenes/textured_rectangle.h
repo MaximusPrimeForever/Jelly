@@ -4,12 +4,11 @@
 #include <graphics/camera.h>
 #include <graphics/render_target.h>
 
-#include <stb_image.h>
-
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "graphics/awesome_gl.h"
+#include "io/file_io.h"
 
 
 class TexturedRectangle : RenderTarget
@@ -75,21 +74,11 @@ public:
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 		glEnableVertexAttribArray(2);
 
-		int width, height, nrChannels;
-		unsigned char* data = stbi_load(".\\textures\\wood_box.jpg", &width, &height, &nrChannels, 0);
+		int width, height;
+		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture, &width, &height, true)) {
+			throw std::exception("Failed to load image.");
+		}
 
-		glGenTextures(1, &this->texture);
-		glBindTexture(GL_TEXTURE_2D, this->texture);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		stbi_image_free(data);
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
 

@@ -81,14 +81,8 @@
     <ClCompile Include="libs\imgui\imgui_widgets.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\blending.cpp">
-      <Filter>Source Files\io</Filter>
-    </ClCompile>
     <ClCompile Include="src\glad.c">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Widgets\image_compositor.cpp">
-      <Filter>Source Files\widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\main_window.cpp">
       <Filter>Source Files\window</Filter>
@@ -218,9 +212,6 @@
     <ClInclude Include="include\widgets\base_widget.h">
       <Filter>Header Files\widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\widgets\image_compositor.h">
-      <Filter>Header Files\widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\main_window.h">
       <Filter>Header Files\window</Filter>
     </ClInclude>
@@ -239,28 +230,28 @@
     <ClInclude Include="include\graphics\render_target.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\examples\texured_rectangle.h">
+    <ClInclude Include="src\graphics\scenes\textured_rectangle.h">
       <Filter>Source Files\graphics\examples</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\examples\awesome_rectangle.h">
+    <ClInclude Include="src\graphics\scenes\awesome_rectangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\graphics\awesome_gl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\examples\awesome_cube.h">
+    <ClInclude Include="src\graphics\scenes\awesome_cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\examples\awesome_cube_field.h">
+    <ClInclude Include="src\graphics\scenes\awesome_cube_field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\graphics\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\examples\let_there_be_light.h">
+    <ClInclude Include="src\graphics\scenes\let_there_be_light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\examples\xz_grid.h">
+    <ClInclude Include="src\graphics\scenes\xz_grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

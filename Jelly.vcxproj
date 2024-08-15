@@ -138,12 +138,10 @@
     <ClCompile Include="libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="src\blending.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\graphics\camera.cpp" />
     <ClCompile Include="src\graphics\shaders.cpp" />
     <ClCompile Include="src\main_window.cpp" />
-    <ClCompile Include="src\Widgets\image_compositor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_allegro5.h" />
@@ -177,7 +175,6 @@
     <ClInclude Include="include\settings.h" />
     <ClInclude Include="include\superglue.h" />
     <ClInclude Include="include\widgets\base_widget.h" />
-    <ClInclude Include="include\widgets\image_compositor.h" />
     <ClInclude Include="include\widgets\settings_menu.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3.h" />
     <ClInclude Include="libs\glfw\include\glfw\glfw3native.h" />
@@ -190,12 +187,12 @@
     <ClInclude Include="libs\imgui\include\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\include\imstb_truetype.h" />
     <ClInclude Include="src\defs.h" />
-    <ClInclude Include="src\graphics\examples\awesome_cube.h" />
-    <ClInclude Include="src\graphics\examples\awesome_cube_field.h" />
-    <ClInclude Include="src\graphics\examples\awesome_rectangle.h" />
-    <ClInclude Include="src\graphics\examples\let_there_be_light.h" />
-    <ClInclude Include="src\graphics\examples\texured_rectangle.h" />
-    <ClInclude Include="src\graphics\examples\xz_grid.h" />
+    <ClInclude Include="src\graphics\scenes\awesome_cube.h" />
+    <ClInclude Include="src\graphics\scenes\awesome_cube_field.h" />
+    <ClInclude Include="src\graphics\scenes\awesome_rectangle.h" />
+    <ClInclude Include="src\graphics\scenes\let_there_be_light.h" />
+    <ClInclude Include="src\graphics\scenes\textured_rectangle.h" />
+    <ClInclude Include="src\graphics\scenes\xz_grid.h" />
     <ClInclude Include="src\imfilebrowser.h" />
     <ClCompile Include="src\io\file_io.cpp" />
     <ClInclude Include="src\stb_image.h" />

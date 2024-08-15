@@ -3,13 +3,14 @@
 #include <graphics/shaders.h>
 #include <graphics/render_target.h>
 
-#include <stb_image.h>
 #include "graphics/camera.h"
 #include "graphics/awesome_gl.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "io/file_io.h"
 
 
 class AwesomeRectangle : RenderTarget
@@ -84,31 +85,16 @@ public:
 		int width, height, nrChannels;
 		glGenTextures(2, this->texture);
 
-		stbi_set_flip_vertically_on_load(true);
-		unsigned char* data = stbi_load(".\\textures\\wood_box.jpg", &width, &height, &nrChannels, 0);
-		glBindTexture(GL_TEXTURE_2D, this->texture[0]);
+		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture[0], &width, &height, true)) {
+			throw std::exception("Failed to load image.");
+		}
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// End wooden cube
+		// Start awesome face
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
-		
-		data = stbi_load(".\\textures\\awesomeface.png", &width, &height, &nrChannels, 0);
-		stbi_set_flip_vertically_on_load(false);
-		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
+		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], &width, &height, true)) {
+			throw std::exception("Failed to load image.");
+		}
 
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);

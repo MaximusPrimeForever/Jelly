@@ -3,7 +3,6 @@
 #include <graphics/shaders.h>
 #include <graphics/render_target.h>
 
-#include <stb_image.h>
 #include <graphics/camera.h>
 #include <graphics/awesome_gl.h>
 
@@ -11,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "settings.h"
+#include "io/file_io.h"
 
 
 class AwesomeCube : RenderTarget
@@ -104,47 +104,22 @@ public:
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float) * 3));
 		glEnableVertexAttribArray(1);
 
-		stbi_set_flip_vertically_on_load(true);
-		unsigned char* data = stbi_load(".\\textures\\wood_box.jpg", &width, &height, &nrChannels, 0);
-		glBindTexture(GL_TEXTURE_2D, this->texture[0]);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
+		if (!LoadTextureFromFile(".\\textures\\wood_box.jpg", &this->texture[0], &width, &height, true)) {
+			throw std::exception("Failed to load image.");
+		}
 
 		// End wooden cube
 		// Start awesome face
 
-
-		//glBindBuffer(GL_ARRAY_BUFFER, vbo_face);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(awesome_face_tex_coords), awesome_face_tex_coords, GL_STATIC_DRAW);
-		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-		//glEnableVertexAttribArray(2);
-
-		data = stbi_load(".\\textures\\awesomeface.png", &width, &height, &nrChannels, 0);
-		stbi_set_flip_vertically_on_load(false);
-		glBindTexture(GL_TEXTURE_2D, this->texture[1]);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
+		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], &width, &height, true)) {
+			throw std::exception("Failed to load image.");
+		}
 
 		// End awesome face
 
 		this->program->Use();
 		this->program->SetInt("tex0_data", AGL_SAMPLER_TEXTURE0);
 		this->program->SetInt("tex1_data", AGL_SAMPLER_TEXTURE1);
-
 
 		this->model = glm::mat4(1.0f);
 		this->view = glm::mat4(1.0f);
@@ -170,8 +145,8 @@ public:
 		);
 
 		this->program->SetMat4("model", this->model);
-		this->program->SetMat4("view", this->view);
-		this->program->SetMat4("projection", this->projection);
+		this->program->SetMat4("view", this->cam_->GetViewMatrix());
+		this->program->SetMat4("projection", this->cam_->GetProjectionMatrix());
 
 		glBindVertexArray(this->vao);
 

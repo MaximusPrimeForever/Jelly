@@ -9,6 +9,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "io/file_io.h"
+
 #define CELL_COUNT (20.0f)
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE	// very naughty
 
@@ -62,22 +64,10 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		int width, height, nrChannels;
-		unsigned char* data = stbi_load(".\\textures\\grid_cell.png", &width, &height, &nrChannels, 4);
-
-		glGenTextures(1, &this->texture);
-		glBindTexture(GL_TEXTURE_2D, this->texture);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
+		int width, height;
+		if (!LoadTextureFromFile(".\\textures\\grid_cell.png", &this->texture, &width, &height, true)) {
+			throw std::exception("Failed to load image.");
+		}
 
 		this->grid_program_->Use();
 
@@ -94,8 +84,8 @@ public:
 		{
 			this->grid_program_->Use();
 
-			this->grid_program_->SetMat4("view", this->cam->GetViewMatrix());
-			this->grid_program_->SetMat4("projection", this->cam->GetProjectionMatrix());
+			this->grid_program_->SetMat4("view", this->cam_->GetViewMatrix());
+			this->grid_program_->SetMat4("projection", this->cam_->GetProjectionMatrix());
 
 			glBindVertexArray(this->grid_vao_);
 

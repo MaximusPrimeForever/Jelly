@@ -15,13 +15,13 @@
 #include <functional>
 #include <stb_image.h>
 
-// Render targets
-#include "xz_grid.h"
-#include "graphics/examples/texured_rectangle.h"
-#include "graphics/examples/awesome_rectangle.h"
-#include "graphics/examples/awesome_cube.h"
-#include "graphics/examples/awesome_cube_field.h"
-#include "graphics/examples/let_there_be_light.h"
+// Scenes
+#include "graphics/scenes/xz_grid.h"
+#include "graphics/scenes/textured_rectangle.h"
+#include "graphics/scenes/awesome_rectangle.h"
+#include "graphics/scenes/awesome_cube.h"
+#include "graphics/scenes/awesome_cube_field.h"
+#include "graphics/scenes/let_there_be_light.h"
 
 #include "graphics/camera.h"
 
@@ -43,7 +43,7 @@ MainWindow::MainWindow()
 
 	this->SetupOpenGL();
 
-	this->background_color = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+	this->background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 }
 
 MainWindow::~MainWindow()
@@ -59,7 +59,6 @@ MainWindow::~MainWindow()
 void MainWindow::InitializeSettings()
 {
 	// Setup ImGui widgets
-	this->im_comp = new ImageCompositor(0.0, 0.0, this->font, true);
 	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
 
 	// Setup default settings
@@ -84,7 +83,7 @@ void MainWindow::InitializeSettings()
 
 void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	g_mouse.scroll_y_offset = yoffset;
+	g_mouse.scroll_y_offset = static_cast<float>(yoffset);
 }
 
 void MainWindow::InitializeGlfw()
@@ -188,12 +187,6 @@ void MainWindow::ShowImGui() const
 
 	// Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	ImGui::ShowDemoWindow();
-
-	// Show image compositor
-	if (this->settings_menu->show_image_compositor)
-	{
-		this->im_comp->Show();
-	}
 
 	this->camera->SetVerticalFov(this->settings_menu->vfov);
 	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;

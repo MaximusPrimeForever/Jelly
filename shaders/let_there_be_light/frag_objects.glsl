@@ -1,39 +1,48 @@
 #version 330 core
 out vec4 oFragColor;
 
+in vec2 ioDiffuseTexCoords;
 in vec3 ioNormal;
 in vec3 ioFragViewPos;
 in vec3 ioLightPos;
 
-in mat4 ioViewModelMat;
+struct Light {  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+struct Material {
+    sampler2D diffuse;
+    vec3 specular;
+    float shininess;
+};
 
-uniform vec3 uObjectColor;
-uniform vec3 uLightColor;
+uniform Light uLight;
+uniform Material uMaterial;
+
 
 void main()
-{
-    // ambient
-    float ambientStrength = 0.1;
-    float specularStrength = 0.5;
-    vec3 ambient = ambientStrength * uLightColor;
-    
-    // diffuse
+{    
     vec3 norm = normalize(ioNormal);
     vec3 viewLightPos = ioLightPos;
 
     // incident ray points from light to fragment
-    vec3 incident_ray = normalize(ioFragViewPos - viewLightPos);
+    vec3 incidentRay = normalize(ioFragViewPos - viewLightPos);
     vec3 cameraToFrag = normalize(-ioFragViewPos);
-    
-    vec3 diffuse = max(dot(norm, -incident_ray), 0.0) * uLightColor;
 
-    // reflect ==  incident_ray - 2 * norm * dot(norm, incident_ray);
-    vec3 reflected = reflect(incident_ray, norm);
+    // diffuse
+    float diff = max(dot(norm, -incidentRay), 0.0);
 
-    float spec = pow(max(dot(cameraToFrag, reflected), 0.0), 32);
-    vec3 specular = specularStrength * spec * uLightColor;
+    // specular
+    // reflect == incidentRay - 2 * norm * dot(norm, incidentRay);
+    vec3 reflected = reflect(incidentRay, norm);
+    float spec = pow(max(dot(cameraToFrag, reflected), 0.0), uMaterial.shininess);
 
-    vec3 result = (ambient + diffuse + specular) * uObjectColor;
+    vec3 fragDiffColor = vec3(texture(uMaterial.diffuse, ioDiffuseTexCoords));
+    vec3 ambient =  uLight.ambient  * fragDiffColor;
+    vec3 diffuse =  uLight.diffuse  * (diff * fragDiffColor);
+    vec3 specular = uLight.specular * (spec * uMaterial.specular);
 
+    vec3 result = ambient + diffuse + specular;
     oFragColor = vec4(result, 1.0);
 }

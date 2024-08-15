@@ -6,7 +6,6 @@
 #include "graphics/render_target.h"
 #include "graphics/camera.h"
 
-#include "widgets/image_compositor.h"
 #include "widgets/settings_menu.h"
 
 typedef enum RENDER_TARGET_ENUM_T
@@ -51,7 +50,6 @@ private:
 	SettingsMenu* settings_menu;
 
 	// Widgets
-	ImageCompositor* im_comp;
 	ImFont* font;
 
 	// OpenGL
