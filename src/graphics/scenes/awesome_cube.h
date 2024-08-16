@@ -132,7 +132,9 @@ public:
 		);
 	}
 
-	void Render() override
+	void RenderImGui() override {}
+
+	void RenderGL() override
 	{
 		this->program->Use();
 		float frame_time = 1.0f / (*this->fps);

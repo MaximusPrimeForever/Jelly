@@ -15,12 +15,19 @@ typedef enum RENDER_TARGET_ENUM_T
 	AWESOME_CUBE,
 	AWESOME_CUBE_FIELD,
 	LET_THERE_BE_LIGHT,
-	XZ_GRID,
+	LIT_CONTAINER_PARTY,
 
+	// Grid is drawn last due to transparency
+	XZ_GRID,
 	// Auto count
 	RENDER_TARGET_COUNT
 } RENDER_TARGET_ENUM;
 
+typedef struct RenderEntry_t
+{
+	RenderTarget* target;
+	bool* should_render;
+} RenderEntry;
 
 typedef struct Monitor_t
 {
@@ -55,7 +62,7 @@ private:
 	// OpenGL
 	Mouse mouse;
 	Camera* camera;
-	RenderTarget* render_targets[RENDER_TARGET_COUNT] = { 0 };
+	RenderEntry render_targets[RENDER_TARGET_COUNT] = { nullptr };
 	float mix_value = 0.5;
 
 	void InitializeGlfw();

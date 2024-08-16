@@ -103,7 +103,9 @@ public:
 		);
 	}
 
-	void Render() override
+	void RenderImGui() override {}
+
+	void RenderGL() override
 	{
 		this->program->Use();
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "imgui.h"
+
 #define ASPECT_RATIO (16.0f/10.0f)
 
 #define WINDOW_WIDTH_REL_SCALE (0.8f)
@@ -9,6 +11,8 @@
 #define DEFAULT_BG_IMAGE_PATH ".\\imgs\\background.png"
 #define DEFAULT_FG_IMAGE_PATH ".\\imgs\\teapot.png"
 #define APP_NAME "Jelly"
+
+inline ImFont* g_app_font;
 
 // Camera settings
 /// FOV

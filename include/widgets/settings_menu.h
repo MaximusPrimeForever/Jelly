@@ -22,6 +22,7 @@ public:
     bool show_awesome_cube;
     bool show_awesome_cube_field;
 	bool show_let_there_be_light;
+	bool show_lit_container_party;
 
     bool has_ui_updated;
 	float mouse_sensitivity;
@@ -41,6 +42,7 @@ public:
 		this->show_awesome_cube = false;
 		this->show_awesome_cube_field = false;
 		this->show_let_there_be_light = false;
+		this->show_lit_container_party = false;
 
 		this->has_ui_updated = false;
 		this->mouse_sensitivity = MOUSE_DEFAULT_SENSITIVITY;
@@ -77,22 +79,6 @@ public:
 			MOUSE_MIN_SENSITIVITY,
 			MOUSE_MAX_SENSITIVITY
 		);
-		ImGui::SeparatorText("XYZ sliders");
-		this->has_ui_updated |= ImGui::SliderFloat("X-Axis", &this->shift_x, -1.0f, 1.0f);
-		this->has_ui_updated |= ImGui::SliderFloat("Y-Axis", &this->shift_y, -1.0f, 1.0f);
-		this->has_ui_updated |= ImGui::SliderFloat("Z-Axis", &this->shift_z, -1.0f, 1.0f);
-
-		ImGui::SeparatorText("Color Picker");
-		ImGuiColorEditFlags flags;
-		flags |= ImGuiColorEditFlags_PickerHueBar;
-		flags |= ImGuiColorEditFlags_DisplayRGB;
-		ImGui::ColorPicker4("Light Color", this->color_buffer, flags);
-		this->color_vector = glm::vec4(
-			this->color_buffer[0], 
-			this->color_buffer[1], 
-			this->color_buffer[2], 
-			this->color_buffer[3]
-		);
 
 		ImGui::SeparatorText("Scenes");
 		this->has_ui_updated |= ImGui::Checkbox("Show textured rectangle", &this->show_textured_rect);
@@ -100,6 +86,7 @@ public:
 		this->has_ui_updated |= ImGui::Checkbox("Show awesome cube", &this->show_awesome_cube);
 		this->has_ui_updated |= ImGui::Checkbox("Show awesome cube field", &this->show_awesome_cube_field);
 		this->has_ui_updated |= ImGui::Checkbox("Let there be light!", &this->show_let_there_be_light);
+		this->has_ui_updated |= ImGui::Checkbox("Lit container party", &this->show_lit_container_party);
 
 		ImGui::End();
 		ImGui::PopFont();

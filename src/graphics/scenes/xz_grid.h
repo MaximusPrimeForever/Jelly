@@ -3,7 +3,6 @@
 #include <graphics/shaders.h>
 #include <graphics/render_target.h>
 
-#include <stb_image.h>
 #include <graphics/camera.h>
 #include <graphics/awesome_gl.h>
 
@@ -12,7 +11,6 @@
 #include "io/file_io.h"
 
 #define CELL_COUNT (20.0f)
-#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE	// very naughty
 
 class XzGrid : RenderTarget
 {
@@ -80,7 +78,9 @@ public:
 		this->grid_program_->SetInt("tex", AGL_SAMPLER_TEXTURE0);
 	}
 
-	void Render() override
+	void RenderImGui() override {}
+
+	void RenderGL() override
 	{
 		// Render objects
 		{

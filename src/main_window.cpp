@@ -22,6 +22,7 @@
 #include "graphics/scenes/awesome_cube.h"
 #include "graphics/scenes/awesome_cube_field.h"
 #include "graphics/scenes/let_there_be_light.h"
+#include "graphics/scenes/lit_container_party.h"
 
 #include "graphics/camera.h"
 
@@ -42,8 +43,6 @@ MainWindow::MainWindow()
 	this->InitializeSettings();
 
 	this->SetupOpenGL();
-
-	this->background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 }
 
 MainWindow::~MainWindow()
@@ -58,13 +57,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::InitializeSettings()
 {
+	// Background color
+	this->background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
+
 	// Setup ImGui widgets
-	this->settings_menu = new SettingsMenu(0.0, 0.0, this->font);
+	this->settings_menu = new SettingsMenu(0.0, 0.0, g_app_font);
 
 	// Setup default settings
 	this->settings_menu->enable_depth_testing = true;
-	this->settings_menu->show_let_there_be_light = true;
 	this->settings_menu->show_grid = true;
+	this->settings_menu->show_lit_container_party = true;
 
 	// Set camera settings
 	this->camera = new Camera(
@@ -158,10 +160,12 @@ void MainWindow::Show()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	this->ShowImGui();
-	ImGui::Render();
 
-	// Render
+	// Render scenes
 	this->RenderOpenGL();
+
+	// Render ImGui after RenderOpenGL() because some scenes have their own ImGui menu.
+	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	glfwSwapBuffers(window);
@@ -180,7 +184,7 @@ void MainWindow::InitializeImGui()
 
 	// Apply DPI scale to font and UI elements 
 	// TODO: check font path before loading.
-	this->font = io.Fonts->AddFontFromFileTTF(".\\fonts\\JetBrainsMono-Regular.ttf", FONT_SIZE * this->monitorDimensions.height_dpi_scale);
+	g_app_font = io.Fonts->AddFontFromFileTTF(".\\fonts\\JetBrainsMono-Regular.ttf", FONT_SIZE * this->monitorDimensions.height_dpi_scale);
 	ImGui::GetStyle().ScaleAllSizes(this->monitorDimensions.height_dpi_scale);
 }
 
@@ -288,6 +292,7 @@ void MainWindow::ProcessInput()
 	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
 }
 
+// Load scenes and set OpenGL settings that will not be changed throughout the run.
 void MainWindow::SetupOpenGL()
 {
 	// Enable alpha blending (settings stolen from learnopengl.com without further thought)
@@ -295,14 +300,39 @@ void MainWindow::SetupOpenGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	this->render_targets[TEXTURED_RECTANGLE] = reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera));
-	this->render_targets[AWESOME_RECTANGLE] = reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera));
-	this->render_targets[AWESOME_CUBE] = reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate));
-	this->render_targets[AWESOME_CUBE_FIELD] = reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate));
-	this->render_targets[LET_THERE_BE_LIGHT] = reinterpret_cast<RenderTarget*>(new LetThereBeLight(this->camera, &io.Framerate));
-	this->render_targets[XZ_GRID] = reinterpret_cast<RenderTarget*>(new XzGrid(this->camera));
+
+	this->render_targets[XZ_GRID] = RenderEntry{
+		reinterpret_cast<RenderTarget*>(new XzGrid(this->camera)),
+		&this->settings_menu->show_grid
+	};
+	this->render_targets[TEXTURED_RECTANGLE] = RenderEntry{
+		reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera)),
+		&this->settings_menu->show_textured_rect
+	};
+	this->render_targets[AWESOME_RECTANGLE] = RenderEntry{
+		reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera)),
+		&this->settings_menu->show_awesome_rect
+	};
+	this->render_targets[AWESOME_CUBE] = RenderEntry{
+		 reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate)),
+		&this->settings_menu->show_awesome_cube
+	};
+	this->render_targets[AWESOME_CUBE_FIELD] = RenderEntry{
+		reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate)),
+		&this->settings_menu->show_awesome_cube_field
+	};
+	this->render_targets[LET_THERE_BE_LIGHT] = RenderEntry{
+		reinterpret_cast<RenderTarget*>(new LetThereBeLight(this->camera, &io.Framerate)),
+		&this->settings_menu->show_let_there_be_light
+	};
+	this->render_targets[LIT_CONTAINER_PARTY] = RenderEntry{
+		reinterpret_cast<RenderTarget*>(new LitContainerParty(this->camera, &io.Framerate)),
+		&this->settings_menu->show_lit_container_party
+	};
+
 }
 
+// Draw scenes.
 void MainWindow::RenderOpenGL() const
 {
 	if (this->settings_menu->enable_wireframe) {
@@ -321,59 +351,10 @@ void MainWindow::RenderOpenGL() const
 
 	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)
 	{
-		RenderTarget* current_target = this->render_targets[i];
-		if (current_target != nullptr)
-		{
-			switch (i)
-			{
-			case TEXTURED_RECTANGLE:
-			{
-				TexturedRectangle* tex_rect = reinterpret_cast<TexturedRectangle*>(current_target);
-				tex_rect->shift_x = this->settings_menu->shift_x;
-				tex_rect->shift_y = this->settings_menu->shift_y;
-				tex_rect->shift_z = this->settings_menu->shift_z;
-				if (this->settings_menu->show_textured_rect) current_target->Render();
-				break;
-			}
-			case AWESOME_RECTANGLE:
-			{
-				AwesomeRectangle* tex_rect = reinterpret_cast<AwesomeRectangle*>(current_target);
-				tex_rect->mix_value = this->mix_value;
-				if (this->settings_menu->show_awesome_rect) current_target->Render();
-				break;
-			}
-			case AWESOME_CUBE:
-			{
-				if (this->settings_menu->show_awesome_cube) current_target->Render();
-				break;
-			}
-			case AWESOME_CUBE_FIELD:
-			{
-				if (this->settings_menu->show_awesome_cube_field) current_target->Render();
-				break;
-			}
-			case LET_THERE_BE_LIGHT:
-			{
-				LetThereBeLight* light_scene = reinterpret_cast<LetThereBeLight*>(current_target);
-				light_scene->light_shift = glm::vec3(
-					this->settings_menu->shift_x,
-					this->settings_menu->shift_y,
-					this->settings_menu->shift_z
-				);
-				light_scene->light_color = this->settings_menu->color_vector;
-				if (this->settings_menu->show_let_there_be_light) current_target->Render();
-				break;
-			}
-			case XZ_GRID:
-			{
-				if (this->settings_menu->show_grid) current_target->Render();
-				break;
-			}
-			default:
-				current_target->Render();
-				break;
-			}
-		}
+		RenderEntry current_target = this->render_targets[i];
+		if (current_target.target == nullptr || !*current_target.should_render) continue;
+
+		current_target.target->Render();
 	}
 }
 

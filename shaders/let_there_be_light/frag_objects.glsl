@@ -6,7 +6,7 @@ in vec3 ioNormal;
 in vec3 ioFragViewPos;
 in vec3 ioLightPos;
 
-struct Light {  
+struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -14,7 +14,6 @@ struct Light {
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
-    sampler2D emission;
     float shininess;
 };
 
@@ -28,7 +27,7 @@ void main()
     vec3 viewLightPos = ioLightPos;
 
     // incident ray points from light to fragment
-    vec3 incidentRay = normalize(ioFragViewPos - viewLightPos);
+    vec3 incidentRay = normalize(ioFragViewPos - ioLightPos);
     vec3 cameraToFrag = normalize(-ioFragViewPos);
 
     // diffuse
@@ -42,14 +41,13 @@ void main()
     vec3 fragDiffColor = vec3(texture(uMaterial.diffuse, ioTexCoords));
     vec3 fragSpecColor = vec3(texture(uMaterial.specular, ioTexCoords));
 
+    // crop emission texture
     vec2 emisCoord = (ioTexCoords * 1.2) - 0.1;
-    vec3 fragEmisColor = vec3(texture(uMaterial.emission, emisCoord));
 
     vec3 ambient =  uLight.ambient  * fragDiffColor;
     vec3 diffuse =  uLight.diffuse  * (diff * fragDiffColor);
     vec3 specular = uLight.specular * (spec * fragSpecColor);
-    vec3 emission = fragEmisColor;
 
-    vec3 result = ambient + diffuse + specular + fragEmisColor;
+    vec3 result = ambient + diffuse + specular;
     oFragColor = vec4(result, 1.0);
 }

@@ -104,11 +104,6 @@ public:
 		// End wooden cube
 		// Start awesome face
 
-		//glBindBuffer(GL_ARRAY_BUFFER, vbo_face);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(awesome_face_tex_coords), awesome_face_tex_coords, GL_STATIC_DRAW);
-		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-		//glEnableVertexAttribArray(2);
-
 		if (!LoadTextureFromFile(".\\textures\\awesomeface.png", &this->texture[1], true)) {
 			throw std::exception("Failed to load image.");
 		}
@@ -122,7 +117,9 @@ public:
 		this->model = glm::mat4(1.0f);
 	}
 
-	void Render() override
+	void RenderImGui() override {}
+
+	void RenderGL() override
 	{
 		this->program->Use();
 		float frame_time = 1.0f / (*this->fps);

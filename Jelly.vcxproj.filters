@@ -254,6 +254,9 @@
     <ClInclude Include="src\graphics\scenes\xz_grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\scenes\lit_container_party.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
@@ -276,6 +279,10 @@
     <None Include="shaders\let_there_be_light\frag_light.glsl" />
     <None Include="shaders\xz_grid\frag_xz_grid.glsl" />
     <None Include="shaders\xz_grid\vertex_xz_grid.glsl" />
+    <None Include="shaders\lit_container_party\frag_light.glsl" />
+    <None Include="shaders\lit_container_party\frag_objects.glsl" />
+    <None Include="shaders\lit_container_party\vertex_light.glsl" />
+    <None Include="shaders\lit_container_party\vertex_objects.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\JetBrainsMono-Regular.ttf">
