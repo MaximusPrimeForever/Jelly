@@ -54,9 +54,8 @@ private:
 	ImVec4 background_color;
 
 	// Settings
-	bool enable_fly_camera;
 	SettingsMenu* settings_menu;
-	float key_last_pressed_time;
+	double key_last_pressed_time;
 
 	// Widgets
 	ImFont* font;

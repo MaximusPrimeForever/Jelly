@@ -78,7 +78,7 @@ void MainWindow::InitializeSettings()
 	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
 
 	// Set mouse settings
-	this->enable_fly_camera = false;
+	this->settings_menu->enable_flight_mode = false;
 	this->mouse.last_x = static_cast<float>(this->monitorDimensions.width) / 2.0f;
 	this->mouse.last_y = static_cast<float>(this->monitorDimensions.height) / 2.0f;
 	this->mouse.is_visible = true;
@@ -220,7 +220,7 @@ void MainWindow::UpdateCameraFromMouse(float frame_time)
 	this->settings_menu->vfov -= g_mouse.scroll_y_offset;
 	g_mouse.scroll_y_offset = 0.0f;
 
-	if (this->enable_fly_camera) {
+	if (this->settings_menu->enable_flight_mode) {
 		this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
 		this->mouse.is_visible = false;
 
@@ -320,7 +320,7 @@ void MainWindow::ProcessInput()
 
 		if ((now - this->key_last_pressed_time) > KEYBOARD_PRESS_TIMEOUT_SECS)
 		{
-			this->enable_fly_camera = !this->enable_fly_camera;
+			this->settings_menu->enable_flight_mode = !this->settings_menu->enable_flight_mode;
 			this->key_last_pressed_time = now;
 		}
 	}
