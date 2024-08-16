@@ -78,9 +78,12 @@ void MainWindow::InitializeSettings()
 	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
 
 	// Set mouse settings
-	this->disable_cursor = false;
+	this->enable_fly_camera = false;
 	this->mouse.last_x = static_cast<float>(this->monitorDimensions.width) / 2.0f;
 	this->mouse.last_y = static_cast<float>(this->monitorDimensions.height) / 2.0f;
+	this->mouse.is_visible = true;
+
+	this->key_last_pressed_time = 0.0f;
 }
 
 void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -199,8 +202,10 @@ void MainWindow::ShowImGui() const
 	this->camera->look_sensitivity = this->settings_menu->mouse_sensitivity;
 }
 
-void MainWindow::UpdateCameraFromMouse()
+void MainWindow::UpdateCameraFromMouse(float frame_time)
 {
+	this->mouse.is_visible = true;
+
 	double x_pos, y_pos;
 	glfwGetCursorPos(this->window, &x_pos, &y_pos);
 
@@ -215,16 +220,50 @@ void MainWindow::UpdateCameraFromMouse()
 	this->settings_menu->vfov -= g_mouse.scroll_y_offset;
 	g_mouse.scroll_y_offset = 0.0f;
 
-	if (!this->disable_cursor) return;
-	this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
+	if (this->enable_fly_camera) {
+		this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
+		this->mouse.is_visible = false;
+
+		goto show_or_hide_mouse;
+	}
+
+	// TODO: Make the camera rotate around a point the mouse points to
+	// Rotate camera when holding right mouse
+	if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
+		this->mouse.is_visible = false;
+	}
+
+	// Translate camera when holding middle mouse
+	if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+		this->mouse.is_visible = false;
+
+		CAMERA_DIRECTION camera_direction = delta_x < 0.0 ? CAMERA_DIRECTION::RIGHT : CAMERA_DIRECTION::LEFT;
+		this->camera->ProcessAxisLockedMovement(
+			camera_direction,
+			frame_time * abs(delta_x * MOUSE_DRAG_SENSITIVITY)
+		);
+
+		camera_direction = delta_y < 0.0 ? CAMERA_DIRECTION::FORWARD : CAMERA_DIRECTION::BACKWARD;
+		this->camera->ProcessAxisLockedMovement(
+			camera_direction,
+			frame_time * abs(delta_y * MOUSE_DRAG_SENSITIVITY)
+		);
+	}
+
+show_or_hide_mouse:
+	if (this->mouse.is_visible)
+	{
+		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	} else {
+		//glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
 }
 
-void MainWindow::UpdateCameraFromKeyboard() const
+void MainWindow::UpdateCameraFromKeyboard(float frame_time) const
 {
-
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	float frame_time = 1000.0f / io.Framerate;
-
 	// X-axis
 	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS) {
 		this->camera->ProcessAxisLockedMovement(CAMERA_DIRECTION::RIGHT, frame_time);
@@ -267,7 +306,8 @@ bool MainWindow::GetMonitorDimensions()
 
 void MainWindow::ProcessInput()
 {
-	// TODO: separate camera logic from user input
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	float frame_time = 1000.0f / io.Framerate;
 
 	// Close window when pressing ESC
 	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -276,20 +316,18 @@ void MainWindow::ProcessInput()
 
 	// Toggle mouse using HOME
 	if (glfwGetKey(this->window, GLFW_KEY_HOME) == GLFW_PRESS) {
-		this->disable_cursor = !this->disable_cursor;
+		double now = glfwGetTime();
 
-		if (this->disable_cursor) {
- 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		} else {
-			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		if ((now - this->key_last_pressed_time) > KEYBOARD_PRESS_TIMEOUT_SECS)
+		{
+			this->enable_fly_camera = !this->enable_fly_camera;
+			this->key_last_pressed_time = now;
 		}
 	}
 
 	// Update camera from mouse and keyboard inputs
-	this->UpdateCameraFromMouse();
-	this->UpdateCameraFromKeyboard();
-
-	this->mix_value = std::clamp(this->mix_value, 0.0f, 1.0f);
+	this->UpdateCameraFromMouse(frame_time);
+	this->UpdateCameraFromKeyboard(frame_time);
 }
 
 // Load scenes and set OpenGL settings that will not be changed throughout the run.

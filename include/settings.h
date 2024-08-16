@@ -35,4 +35,8 @@ inline ImFont* g_app_font;
 // Mouse settings
 #define MOUSE_MIN_SENSITIVITY (0.001f)
 #define MOUSE_MAX_SENSITIVITY (1.0f)
-#define MOUSE_DEFAULT_SENSITIVITY (0.04f)
+#define MOUSE_DEFAULT_SENSITIVITY (0.1f)
+#define MOUSE_DRAG_SENSITIVITY (0.1f)
+
+// Keyboard settings
+#define KEYBOARD_PRESS_TIMEOUT_SECS (0.100)

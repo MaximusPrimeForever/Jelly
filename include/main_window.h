@@ -42,6 +42,7 @@ typedef struct Mouse_t
 	float last_x;
 	float last_y;
 	float scroll_y_offset;
+	bool is_visible;
 } Mouse;
 
 class MainWindow
@@ -53,8 +54,9 @@ private:
 	ImVec4 background_color;
 
 	// Settings
-	bool disable_cursor;
+	bool enable_fly_camera;
 	SettingsMenu* settings_menu;
+	float key_last_pressed_time;
 
 	// Widgets
 	ImFont* font;
@@ -63,7 +65,6 @@ private:
 	Mouse mouse;
 	Camera* camera;
 	RenderEntry render_targets[RENDER_TARGET_COUNT] = { nullptr };
-	float mix_value = 0.5;
 
 	void InitializeGlfw();
 	void InitializeImGui();
@@ -78,8 +79,8 @@ public:
 	MainWindow();
 	~MainWindow();
 
-	void UpdateCameraFromMouse();
-	void UpdateCameraFromKeyboard() const;
+	void UpdateCameraFromMouse(float frame_time);
+	void UpdateCameraFromKeyboard(float frame_time) const;
 	bool ShouldClose();
 	void Show();
 	void InitializeSettings();
