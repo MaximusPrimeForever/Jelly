@@ -68,7 +68,6 @@ void Camera::ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool 
 }
 
 // Currently rotates around 0,0,0
-// Works ok, but feels kinda weird
 void Camera::ProcessRotationAroundOrigin(float yaw_offset, float pitch_offset, bool constrain_pitch)
 {
 	// Rotate camera vertically around camera-right axis
@@ -80,11 +79,11 @@ void Camera::ProcessRotationAroundOrigin(float yaw_offset, float pitch_offset, b
 
 	new_position = glm::rotate(
 		new_position,
-		glm::radians(yaw_offset * MOUSE_DEFAULT_SENSITIVITY),
+		glm::radians(-yaw_offset * MOUSE_DEFAULT_SENSITIVITY),
 		this->world_up
 	);
 	this->position = new_position;
-	this->ProcessAxisFreeMovement(-yaw_offset, pitch_offset, constrain_pitch);
+	this->ProcessAxisFreeMovement(yaw_offset, pitch_offset, constrain_pitch);
 }
 
 void Camera::SetDistanceDelta(float distance_delta, float delta_time)
