@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "imgui.h"
 #include "superglue.h"
 
@@ -48,6 +50,7 @@ typedef struct Mouse_t
 class MainWindow
 {
 private:
+	// Window
 	GLFWwindow* window;
 	const char* glsl_version;
 	Monitor monitorDimensions;
@@ -74,6 +77,8 @@ private:
 	void RenderOpenGL() const;
 	void SetupOpenGL();
 
+	void FrameBufferResizeCallback(GLFWwindow* window, int width, int height);
+
 public:
 	MainWindow();
 	~MainWindow();
@@ -83,7 +88,10 @@ public:
 	bool ShouldClose();
 	void Show();
 	void InitializeSettings();
+	glm::vec3 GetRayFromScreenSpace(GLuint x, GLuint y);
+
+	std::function<void(GLFWwindow*, int, int)> window_resize_callback;
 };
 
-inline Mouse g_mouse;
+inline Mouse g_mouse = {0.0f, 0.0f, 0.0f, true};
 void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);

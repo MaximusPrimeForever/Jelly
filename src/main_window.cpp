@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "superglue.h"
 
@@ -138,7 +139,21 @@ void MainWindow::InitializeGlfw()
 	glfwSwapInterval(1); // Enable vsync
 
 	glfwSetScrollCallback(window, MouseScrollCallback);
+
+	// help!
+	//this->window_resize_callback = [this](GLFWwindow* window, int width, int height)
+	//{
+	//	this->FrameBufferResizeCallback(window, width, height);
+	//};
+
+	//glfwSetFramebufferSizeCallback(this->window, (GLFWframebuffersizefun)&this->window_resize_callback);
 }
+
+void MainWindow::FrameBufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+	std::cout << "Resize callback" << '\n';
+}
+
 
 bool MainWindow::ShouldClose()
 {
@@ -193,6 +208,7 @@ void MainWindow::InitializeImGui()
 
 void MainWindow::ShowImGui() const
 {
+	this->settings_menu->camera_position = this->camera->position;
 	this->settings_menu->Show();
 
 	// Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
@@ -215,22 +231,21 @@ void MainWindow::UpdateCameraFromMouse(float frame_time)
 	this->mouse.last_x = static_cast<float>(x_pos);
 	this->mouse.last_y = static_cast<float>(y_pos);
 
-	// When cursor is enabled, ignore orientation changes but react to scrolling
-	// FOV is controlled from the settings menu, so updated that instead of the camera directly
-	this->settings_menu->vfov -= g_mouse.scroll_y_offset;
+	// Move camera forwards or backwards using scroll wheel
+	this->camera->SetDistanceDelta(g_mouse.scroll_y_offset, frame_time);
 	g_mouse.scroll_y_offset = 0.0f;
 
 	if (this->settings_menu->enable_flight_mode) {
 		this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
 		this->mouse.is_visible = false;
 
-		goto show_or_hide_mouse;
+		return;
 	}
 
-	// TODO: Make the camera rotate around a point the mouse points to
+	// TODO: Make rotation around screen space coordinate from mouse position
 	// Rotate camera when holding right mouse
 	if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-		this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
+		this->camera->ProcessRotationAroundOrigin(delta_x, delta_y);
 		this->mouse.is_visible = false;
 	}
 
@@ -251,7 +266,6 @@ void MainWindow::UpdateCameraFromMouse(float frame_time)
 		);
 	}
 
-show_or_hide_mouse:
 	if (this->mouse.is_visible)
 	{
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -308,6 +322,8 @@ void MainWindow::ProcessInput()
 {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	float frame_time = 1000.0f / io.Framerate;
+
+	if (isinf(frame_time)) frame_time = 0.0f;
 
 	// Close window when pressing ESC
 	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -396,3 +412,25 @@ void MainWindow::RenderOpenGL() const
 	}
 }
 
+// x,y are in the range -1 <> 1
+glm::vec3 MainWindow::GetRayFromScreenSpace(GLuint x, GLuint y)
+{
+	int width, height;
+	glfwGetFramebufferSize(this->window, &width, &height);
+
+	float ndc_x = (static_cast<float>(x) / static_cast<float>(width)) * 2.0f - 1.0f;
+	float ndc_y = (static_cast<float>(y) / static_cast<float>(height)) * 2.0f - 1.0f;
+
+	glm::mat4 view_mat = this->camera->GetViewMatrix();
+	glm::mat4 projection_mat = this->camera->GetProjectionMatrix();
+	glm::mat4 view_inverse_mat = glm::inverse(view_mat);
+	glm::mat4 projection_inverse_mat = glm::inverse(projection_mat);
+
+	glm::vec4 cam_pos_view(0.0f, 0.0f, 0.0f, 1.0f);
+	glm::vec4 ray_dir_point_view = glm::normalize(projection_inverse_mat * glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f));
+
+	glm::vec3 cam_pos_world = glm::vec3(view_inverse_mat * cam_pos_view);
+	glm::vec3 ray_dir_point_world = glm::vec3(view_inverse_mat * (ray_dir_point_view - cam_pos_view));
+
+	return glm::normalize(ray_dir_point_world - cam_pos_world);
+}

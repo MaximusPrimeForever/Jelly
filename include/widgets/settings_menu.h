@@ -9,9 +9,13 @@ class SettingsMenu : BaseWidget
 public:
     bool enable_wireframe;
     bool enable_depth_testing;
-	bool enable_flight_mode;
-    float vfov;
 
+	// Camera
+	float vfov;
+	bool enable_flight_mode;
+	glm::vec3 camera_position;
+
+	// Scenes
 	bool show_grid;
 	bool show_textured_rect;
     bool show_awesome_rect;
@@ -60,6 +64,7 @@ public:
 
 		ImGui::SeparatorText("Camera settings");
 		{
+			ImGui::Text("Camera position: %.2f, %.2f, %.2f", this->camera_position.x, this->camera_position.y, this->camera_position.z);
 			ImGui::Text("Mode (Press HOME or me to toggle)");
 			float mode_color_hue;
 			std::string mode_name;

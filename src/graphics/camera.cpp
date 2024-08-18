@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "settings.h"
 
@@ -24,27 +25,30 @@ Camera::Camera(glm::vec3 position, glm::vec3 world_up, float yaw, float pitch):
 void Camera::ProcessAxisLockedMovement(CAMERA_DIRECTION direction, float delta_time)
 {
 	float new_velocity = (this->velocity * delta_time);
+	glm::vec3 position_delta = glm::vec3(0.0f);
 	switch (direction)
 	{
-	case CAMERA_DIRECTION::FORWARD:
-		this->position += this->front * new_velocity;
-		break;
-	case CAMERA_DIRECTION::BACKWARD:
-		this->position -= this->front * new_velocity;
-		break;
-	case CAMERA_DIRECTION::RIGHT:
-		this->position += this->right * new_velocity;
-		break;
-	case CAMERA_DIRECTION::LEFT:
-		this->position -= this->right * new_velocity;
-		break;
-	case CAMERA_DIRECTION::UP:
-		this->position += this->world_up * new_velocity;
-		break;
-	case CAMERA_DIRECTION::DOWN:
-		this->position -= this->world_up * new_velocity;
-		break;
+		case CAMERA_DIRECTION::FORWARD:
+			position_delta = this->front * new_velocity;
+			break;
+		case CAMERA_DIRECTION::BACKWARD:
+			position_delta = -this->front * new_velocity;
+			break;
+		case CAMERA_DIRECTION::RIGHT:
+			position_delta = this->right * new_velocity;
+			break;
+		case CAMERA_DIRECTION::LEFT:
+			position_delta = -this->right * new_velocity;
+			break;
+		case CAMERA_DIRECTION::UP:
+			position_delta = this->world_up * new_velocity;
+			break;
+		case CAMERA_DIRECTION::DOWN:
+			position_delta = -this->world_up * new_velocity;
+			break;
 	}
+
+	this->position += position_delta;
 }
 
 void Camera::ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool constrain_pitch)
@@ -61,6 +65,34 @@ void Camera::ProcessAxisFreeMovement(float yaw_offset, float pitch_offset, bool 
 	}
 
 	this->UpdateCameraVectors();
+}
+
+// Currently rotates around 0,0,0
+// Works ok, but feels kinda weird
+void Camera::ProcessRotationAroundOrigin(float yaw_offset, float pitch_offset, bool constrain_pitch)
+{
+	// Rotate camera vertically around camera-right axis
+	glm::vec3 new_position = glm::rotate(
+		this->position,
+		glm::radians(pitch_offset * MOUSE_DEFAULT_SENSITIVITY),
+		this->right
+	);
+
+	new_position = glm::rotate(
+		new_position,
+		glm::radians(yaw_offset * MOUSE_DEFAULT_SENSITIVITY),
+		this->world_up
+	);
+	this->position = new_position;
+	this->ProcessAxisFreeMovement(-yaw_offset, pitch_offset, constrain_pitch);
+}
+
+void Camera::SetDistanceDelta(float distance_delta, float delta_time)
+{
+	if (abs(distance_delta) < 0.00001f) return;
+
+	CAMERA_DIRECTION dir = distance_delta > 0.0f ? CAMERA_DIRECTION::FORWARD : CAMERA_DIRECTION::BACKWARD;
+	this->ProcessAxisLockedMovement(dir, delta_time * MOUSE_SCROLL_SENSITIVITY);
 }
 
 void Camera::SetVerticalFov(float new_vfov)
