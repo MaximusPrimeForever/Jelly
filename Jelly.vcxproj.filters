@@ -257,6 +257,27 @@
     <ClInclude Include="src\graphics\scenes\lit_container_party.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\datastructs\world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\phong_light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\scenes\global_world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\primitives\cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics\material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\emscripten\shell_minimal.html" />
@@ -283,6 +304,10 @@
     <None Include="shaders\lit_container_party\frag_objects.glsl" />
     <None Include="shaders\lit_container_party\vertex_light.glsl" />
     <None Include="shaders\lit_container_party\vertex_objects.glsl" />
+    <None Include="shaders\world\frag_light.glsl" />
+    <None Include="shaders\world\frag_objects.glsl" />
+    <None Include="shaders\world\vertex_light.glsl" />
+    <None Include="shaders\world\vertex_objects.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\JetBrainsMono-Regular.ttf">

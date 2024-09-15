@@ -167,7 +167,7 @@ public:
 		ImGui::SliderFloat("Z-Axis", &this->light_pos_offset_.z, -1.0f, 1.0f);
 
 		ImGui::SeparatorText("Light Color Picker");
-		ImGuiColorEditFlags flags;
+		ImGuiColorEditFlags flags = 0;
 		flags |= ImGuiColorEditFlags_PickerHueBar;
 		flags |= ImGuiColorEditFlags_DisplayRGB;
 		ImGui::ColorPicker3("Light Color", this->imgui_light_rgba, flags);
@@ -212,18 +212,21 @@ public:
 			glBindVertexArray(this->obj_vao_);
 			this->objects_program_->Use();
 
-			this->objects_program_->SetVec3("uLightPos", temp_light_pos);
+			this->objects_program_->SetVec3("uLightPos", this->cam_->position);
 			this->objects_program_->SetMat4("uView", view_matrix);
 			this->objects_program_->SetMat4("uProjection", projection_matrix);
 
 			// Set light properties
 			/*
+			// Directional light
 			this->objects_program_->SetVec3("uDirLight.direction", temp_light_pos);
 			this->objects_program_->SetVec3("uDirLight.ambient", light_ambient);
 			this->objects_program_->SetVec3("uDirLight.diffuse", light_diffuse);
 			this->objects_program_->SetVec3("uDirLight.specular", light_specular);
 			*/
 
+			/*
+			// Point light
 			this->objects_program_->SetVec3("uPointLight.ambient", light_ambient);
 			this->objects_program_->SetVec3("uPointLight.diffuse", light_diffuse);
 			this->objects_program_->SetVec3("uPointLight.specular", light_specular);
@@ -231,6 +234,19 @@ public:
 			this->objects_program_->SetFloat("uPointLight.constant", 1.0f);
 			this->objects_program_->SetFloat("uPointLight.linear", 0.09f);
 			this->objects_program_->SetFloat("uPointLight.quadratic", 0.032f);
+			*/
+
+			this->objects_program_->SetVec3("uLightDir", this->cam_->front);
+			this->objects_program_->SetFloat("uSpotLight.innerCutoff", glm::cos(glm::radians(10.0f)));
+			this->objects_program_->SetFloat("uSpotLight.outerCutoff", glm::cos(glm::radians(15.0f)));
+
+			this->objects_program_->SetVec3("uSpotLight.ambient", light_ambient);
+			this->objects_program_->SetVec3("uSpotLight.diffuse", light_diffuse);
+			this->objects_program_->SetVec3("uSpotLight.specular", light_specular);
+
+			this->objects_program_->SetFloat("uSpotLight.constant", 1.0f);
+			this->objects_program_->SetFloat("uSpotLight.linear", 0.09f);
+			this->objects_program_->SetFloat("uSpotLight.quadratic", 0.032f);
 
 			// Set cube textures
 			glActiveTexture(GL_TEXTURE0);

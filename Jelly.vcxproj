@@ -91,6 +91,7 @@
       <WarningLevel>Level3</WarningLevel>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\backends;$(ProjectDir)\libs\glfw\include;$(ProjectDir)\libs\imgui\include;$(ProjectDir)\src\graphics\examples;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -164,9 +165,15 @@
     <ClInclude Include="backends\imgui_impl_vulkan.h" />
     <ClInclude Include="backends\imgui_impl_wgpu.h" />
     <ClInclude Include="backends\imgui_impl_win32.h" />
+    <ClInclude Include="include\datastructs\world.h" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\graphics\awesome_gl.h" />
     <ClInclude Include="include\graphics\camera.h" />
+    <ClInclude Include="include\graphics\consts.h" />
+    <ClInclude Include="include\graphics\material.h" />
+    <ClInclude Include="include\graphics\mesh.h" />
+    <ClInclude Include="include\graphics\phong_light.h" />
+    <ClInclude Include="include\graphics\primitives\cube.h" />
     <ClInclude Include="include\graphics\render_target.h" />
     <ClInclude Include="include\graphics\shaders.h" />
     <ClInclude Include="include\io\file_io.h" />
@@ -193,6 +200,7 @@
     <ClInclude Include="src\graphics\scenes\let_there_be_light.h" />
     <ClInclude Include="src\graphics\scenes\lit_container_party.h" />
     <ClInclude Include="src\graphics\scenes\textured_rectangle.h" />
+    <ClInclude Include="src\graphics\scenes\global_world.h" />
     <ClInclude Include="src\graphics\scenes\xz_grid.h" />
     <ClInclude Include="src\imfilebrowser.h" />
     <ClCompile Include="src\io\file_io.cpp" />
@@ -218,6 +226,10 @@
     <None Include="shaders\textured_rectangle\frag_tex_rect.glsl" />
     <None Include="shaders\textured_rectangle\vertex_tex_rect.glsl" />
     <None Include="shaders\vertex.glsl" />
+    <None Include="shaders\world\frag_light.glsl" />
+    <None Include="shaders\world\frag_objects.glsl" />
+    <None Include="shaders\world\vertex_light.glsl" />
+    <None Include="shaders\world\vertex_objects.glsl" />
     <None Include="shaders\xz_grid\frag_xz_grid.glsl" />
     <None Include="shaders\xz_grid\vertex_xz_grid.glsl" />
   </ItemGroup>

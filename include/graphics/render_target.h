@@ -1,16 +1,18 @@
 #pragma once
 
 #include "imgui.h"
-#include "camera.h"
 #include "settings.h"
+#include "graphics/camera.h"
+#include "graphics/shaders.h"
 
 class RenderTarget
 {
 protected:
 	Camera* cam_;
 	ImFont* font_;
+	ShaderProgram* program_;
 public:
-	RenderTarget(Camera* cam) : cam_(cam), font_(g_app_font) {}
+	RenderTarget(Camera* cam, ShaderProgram* program = nullptr) : cam_(cam), font_(g_app_font), program_(program) {}
 	virtual ~RenderTarget() = default;
 
 	virtual void RenderGL() = 0;

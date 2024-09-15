@@ -23,6 +23,7 @@ public:
     bool show_awesome_cube_field;
 	bool show_let_there_be_light;
 	bool show_lit_container_party;
+	bool show_global_world;
 
     bool has_ui_updated;
 	float mouse_sensitivity;
@@ -41,6 +42,7 @@ public:
 		this->show_awesome_cube_field = false;
 		this->show_let_there_be_light = false;
 		this->show_lit_container_party = false;
+		this->show_global_world = false;
 
 		this->has_ui_updated = false;
 		this->mouse_sensitivity = MOUSE_DEFAULT_SENSITIVITY;
@@ -108,6 +110,7 @@ public:
 		this->has_ui_updated |= ImGui::Checkbox("Show awesome cube field", &this->show_awesome_cube_field);
 		this->has_ui_updated |= ImGui::Checkbox("Let there be light!", &this->show_let_there_be_light);
 		this->has_ui_updated |= ImGui::Checkbox("Lit container party", &this->show_lit_container_party);
+		this->has_ui_updated |= ImGui::Checkbox("Global world", &this->show_global_world);
 
 		ImGui::End();
 		ImGui::PopFont();

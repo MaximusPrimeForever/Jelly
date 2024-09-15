@@ -10,20 +10,6 @@
 
 #include "widgets/settings_menu.h"
 
-typedef enum RENDER_TARGET_ENUM_T
-{
-	TEXTURED_RECTANGLE = 0,
-	AWESOME_RECTANGLE,
-	AWESOME_CUBE,
-	AWESOME_CUBE_FIELD,
-	LET_THERE_BE_LIGHT,
-	LIT_CONTAINER_PARTY,
-
-	// Grid is drawn last due to transparency
-	XZ_GRID,
-	// Auto count
-	RENDER_TARGET_COUNT
-} RENDER_TARGET_ENUM;
 
 typedef struct RenderEntry_t
 {
@@ -66,7 +52,7 @@ private:
 	// OpenGL
 	Mouse mouse;
 	Camera* camera;
-	RenderEntry render_targets[RENDER_TARGET_COUNT] = { nullptr };
+	std::vector<RenderEntry> render_targets;
 
 	void InitializeGlfw();
 	void InitializeImGui();

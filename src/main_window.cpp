@@ -24,6 +24,7 @@
 #include "graphics/scenes/awesome_cube_field.h"
 #include "graphics/scenes/let_there_be_light.h"
 #include "graphics/scenes/lit_container_party.h"
+#include "graphics/scenes/global_world.h"
 
 #include "graphics/camera.h"
 
@@ -67,7 +68,7 @@ void MainWindow::InitializeSettings()
 	// Setup default settings
 	this->settings_menu->enable_depth_testing = true;
 	this->settings_menu->show_grid = true;
-	this->settings_menu->show_lit_container_party = true;
+	this->settings_menu->show_global_world = true;
 
 	// Set camera settings
 	this->camera = new Camera(
@@ -154,7 +155,6 @@ void MainWindow::FrameBufferResizeCallback(GLFWwindow* window, int width, int he
 	std::cout << "Resize callback" << '\n';
 }
 
-
 bool MainWindow::ShouldClose()
 {
 	return glfwWindowShouldClose(this->window);
@@ -238,6 +238,7 @@ void MainWindow::UpdateCameraFromMouse(float frame_time)
 	if (this->settings_menu->enable_flight_mode) {
 		this->camera->ProcessAxisFreeMovement(delta_x, delta_y);
 		this->mouse.is_visible = false;
+		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		return;
 	}
@@ -270,7 +271,6 @@ void MainWindow::UpdateCameraFromMouse(float frame_time)
 	{
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	} else {
-		//glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
@@ -355,35 +355,40 @@ void MainWindow::SetupOpenGL()
 
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	this->render_targets[XZ_GRID] = RenderEntry{
-		reinterpret_cast<RenderTarget*>(new XzGrid(this->camera)),
-		&this->settings_menu->show_grid
-	};
-	this->render_targets[TEXTURED_RECTANGLE] = RenderEntry{
+	this->render_targets.push_back(RenderEntry{
 		reinterpret_cast<RenderTarget*>(new TexturedRectangle(this->camera)),
 		&this->settings_menu->show_textured_rect
-	};
-	this->render_targets[AWESOME_RECTANGLE] = RenderEntry{
+	});
+	this->render_targets.push_back(RenderEntry{
 		reinterpret_cast<RenderTarget*>(new AwesomeRectangle(this->camera)),
 		&this->settings_menu->show_awesome_rect
-	};
-	this->render_targets[AWESOME_CUBE] = RenderEntry{
+	});
+	this->render_targets.push_back(RenderEntry{
 		 reinterpret_cast<RenderTarget*>(new AwesomeCube(this->camera, &io.Framerate)),
 		&this->settings_menu->show_awesome_cube
-	};
-	this->render_targets[AWESOME_CUBE_FIELD] = RenderEntry{
+	});
+	this->render_targets.push_back(RenderEntry{
 		reinterpret_cast<RenderTarget*>(new AwesomeCubeField(this->camera, &io.Framerate)),
 		&this->settings_menu->show_awesome_cube_field
-	};
-	this->render_targets[LET_THERE_BE_LIGHT] = RenderEntry{
+	});
+	this->render_targets.push_back(RenderEntry{
 		reinterpret_cast<RenderTarget*>(new LetThereBeLight(this->camera, &io.Framerate)),
 		&this->settings_menu->show_let_there_be_light
-	};
-	this->render_targets[LIT_CONTAINER_PARTY] = RenderEntry{
+		});
+	this->render_targets.push_back(RenderEntry{
 		reinterpret_cast<RenderTarget*>(new LitContainerParty(this->camera, &io.Framerate)),
 		&this->settings_menu->show_lit_container_party
-	};
+		});
+	this->render_targets.push_back(RenderEntry{
+		reinterpret_cast<RenderTarget*>(new GlobalWorld(this->camera, &io.Framerate)),
+		&this->settings_menu->show_global_world
+	});
 
+	// Grid should always render last
+	this->render_targets.push_back(RenderEntry{
+		reinterpret_cast<RenderTarget*>(new XzGrid(this->camera)),
+		&this->settings_menu->show_grid
+	});
 }
 
 // Draw scenes.
@@ -403,16 +408,14 @@ void MainWindow::RenderOpenGL() const
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	for (int i = 0; i < RENDER_TARGET_COUNT; ++i)
+	for (RenderEntry re : this->render_targets)
 	{
-		RenderEntry current_target = this->render_targets[i];
-		if (current_target.target == nullptr || !*current_target.should_render) continue;
-
-		current_target.target->Render();
+		if (re.target == nullptr || !(*re.should_render)) continue;
+		re.target->Render();
 	}
 }
 
-// x,y are in the range -1 <> 1
+// X,Y are pixels coordinates in the current window
 glm::vec3 MainWindow::GetRayFromScreenSpace(GLuint x, GLuint y)
 {
 	int width, height;
